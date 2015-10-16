@@ -81,7 +81,7 @@ class ReportService
             $parameter = new Parameter();
             $parameter->placeholder = $placeholder;
             $parameter->name = $this->getRequiredValue($pData, 'name');
-            $parameter->input = $this->getRequiredValue($pData, 'input');
+            $parameter->input = $this->getValue($pData, 'input');
             $parameter->idOfEntity = $this->getValue($pData, 'idOfEntity');
             $parameter->default = $this->getValue($pData, 'default');
 
@@ -91,7 +91,7 @@ class ReportService
         foreach ($this->getValue($data, 'columns', []) as $name => $cData) {
             $column = new Column();
             $column->name = $name;
-            $column->format = $this->getRequiredValue($cData, 'format');
+            $column->format = $this->getValue($cData, 'format');
             $column->chop = $this->getValue($cData, 'chop', null);
             $column->idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
 
