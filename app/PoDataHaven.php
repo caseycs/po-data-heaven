@@ -7,8 +7,10 @@ use Goodby\CSV\Export\Standard\ExporterConfig;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\TwigServiceProvider;
+use SqlFormatter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Twig_Filter_Function;
 
 class PoDataHaven
 {
@@ -32,6 +34,17 @@ class PoDataHaven
         $app['debug'] = true;
 
         $app->register(new TwigServiceProvider(),['twig.path' => __DIR__ . '/../twig']);
+
+        /** @var \Twig_Environment $te */
+        $te = $app['twig'];
+        $te->addFilter(
+            'sqlFormatter',
+            new Twig_Filter_Function(
+                function ($a) {
+                    return SqlFormatter::format($a, true);
+                }
+            )
+        );
 
         $dbParams = [
             'db.options' => [

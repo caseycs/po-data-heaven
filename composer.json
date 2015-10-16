@@ -16,7 +16,8 @@
         "bocharsky-bw/arrayzy": "0.2.*",
         "symfony/twig-bridge": "~2.7",
         "doctrine/dbal": "~2.5",
-        "goodby/csv": "~1.2"
+        "goodby/csv": "~1.2",
+        "jdorn/sql-formatter": "~1.2"
     },
     "autoload": {
         "psr-4": {

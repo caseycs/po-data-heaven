@@ -53,9 +53,7 @@
     </p>
 
     <h3>Raw SQL</h3>
-    <pre>
-    {{ sql }}
-</pre>
+    {{ sql|sqlFormatter|raw }}
 
 
 {% endblock content %}

@@ -129,6 +129,10 @@ class ReportService
         $result->sql = $sql;
         $result->parameters = $params;
 
+        foreach ($params as $param => $value) {
+            $result->sql = str_replace(':' . $param, $this->connection->quote($value), $result->sql);
+        }
+
         return $result;
     }
 
