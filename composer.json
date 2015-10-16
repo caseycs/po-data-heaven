@@ -1,4 +1,11 @@
 {
+    "name": "iliakondrashov/po-data-heaven",
+    "authors": [
+        {
+            "name": "Ilia Kondrashov",
+            "email": "caseycs@gmail.com"
+        }
+    ],
     "require": {
         "silex/silex": "~1.3",
         "symfony/yaml": "~2.7",
