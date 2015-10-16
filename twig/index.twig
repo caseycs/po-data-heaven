@@ -1,6 +1,8 @@
-<h1>
-    reports
-</h1>
+{% extends '_layout.twig' %}
+
+{% block content %}
+
+<h2>All reports</h2>
 
 <ul>
     {% for r in reports %}
@@ -8,3 +10,5 @@
     {% endfor %}
 
 </ul>
+
+{% endblock %}

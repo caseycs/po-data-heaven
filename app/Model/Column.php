@@ -7,5 +7,5 @@ class Column
     const FORMAT_NUMBER = 'number';
 
     /** @var string */
-    public $name, $format, $idOfEntity;
+    public $name, $format, $idOfEntities;
 }

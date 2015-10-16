@@ -1,22 +1,39 @@
-<h1>
-    Report: {{ report.name }}
-</h1>
+{% extends '_layout.twig' %}
 
-<p>
-    {{ report.description }}
-</p>
+{% block content %}
 
-<h2>Parameters</h2>
+    <h2>Report: <code>{{ report.name }}</code></h2>
 
-<form action="/report/{{ report.baseName }}/result" method="GET">
 
-    {% for p in report.parameters %}
-        {{ p.name }}
-        <input type="text" name="{{ p.placeholder }}" value="{{ parameters.get(p.placeholder,p.default) }}"/><br/>
-    {% endfor %}
-    <input type="submit">
-</form>
+    <h3>Legend</h3>
 
-<code>
+    <p>
+        {{ report.description }}
+    </p>
+
+    <h3>Parameters</h3>
+
+    <form class="form-horizontal" action="/report/{{ report.baseName }}/result" method="GET">
+        {% for p in report.parameters %}
+            <div class="form-group">
+                <label for="{{ p.placeholder }}" class="col-sm-2 control-label">Email</label>
+
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="{{ p.placeholder }}" placeholder="{{ p.default }}"
+                           name="{{ p.placeholder }}" value="{{ parameters.get(p.placeholder,p.default) }}">
+                </div>
+            </div>
+        {% endfor %}
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default">Generate</button>
+            </div>
+        </div>
+    </form>
+
+    <h3>Raw SQL</h3>
+    <pre>
     {{ report.sql }}
-</code>
+</pre>
+
+{% endblock %}

@@ -47,15 +47,18 @@ $app->get(
 );
 
 $app->get(
-    '/by-entity/{entity}/{entityId}',
-    function ($entity, $entityId) use ($app) {
-        $reportsOnlyWithOnlyOneParameter = $app['reports']->findWithOnlyEntity($entity);
-        $reportsWithOtherParameters = $app['reports']->findWithEntityAndSomethingElse($entity);
+    '/by-entity/{entities}/{entityId}',
+    function ($entities, $entityId) use ($app) {
+
+        $entities = array_filter(explode(',', $entities));
+
+        $reportsOnlyWithOnlyOneParameter = $app['reports']->findWithOnlyOneEntity($entities);
+        $reportsWithOtherParameters = $app['reports']->findWithEntityAndSomethingElse($entities);
 
         return $app['twig']->render(
             'byEntityId.twig',
             [
-                'entity' => $entity,
+                'entities' => $entities,
                 'entityId' => $entityId,
                 'reports' => [
                     'only' => $reportsOnlyWithOnlyOneParameter,
@@ -69,10 +72,17 @@ $app->get(
 $app->get(
     '/report/{baseName}',
     function ($baseName, \Symfony\Component\HttpFoundation\Request $request) use ($app) {
+        /** @var \PODataHeaven\Model\Report $report */
+        $report = $app['reports']->findOneByBaseName($baseName);
+
+        if ([] === $report->parameters) {
+            return new \Symfony\Component\HttpFoundation\RedirectResponse("/report/{$baseName}/result");
+        }
+
         return $app['twig']->render(
             'reportConfig.twig',
             [
-                'report' => $app['reports']->findOneByBaseName($baseName),
+                'report' => $report,
                 'parameters' => $request->query,
             ]
         );

@@ -1,34 +1,51 @@
-<h1>
-    Report: {{ report.name }}
-</h1>
+{% extends '_layout.twig' %}
 
-<h2>Parameters</h2>
+{% block content %}
 
-{% for p in report.parameters %}
-    {{ p.name }}: {{ parameters[p.placeholder] }}<br/>
-{% endfor %}
+    <h2>Report: <code>{{ report.name }}</code></h2>
 
-<table>
-    <thead>
-    <tr>
-        {% for column, value in rows[0] %}
-            <th>{{ column }}</th>
+    <h3>Parameters</h3>
+    <p>
+        {% for p in report.parameters %}
+            {{ p.name }}: {{ parameters[p.placeholder] }}<br/>
         {% endfor %}
-    </tr>
-    </thead>
-    <tbody>
-    {% for row in rows %}
+    </p>
+
+    <table class="table-condensed table-bordered">
+        <thead>
         <tr>
-            {% for k,v in row %}
-                <td>
-                    {% if report.columns[k] is defined and report.columns[k].idOfEntity %}
-                        <a href="/by-entity/{{ report.columns[k].idOfEntity }}/{{ v }}">{{ v }}</a>
-                    {% else %}
-                    {{ v }}
-                    {% endif %}
-                </td>
+            {% for column, value in rows[0] %}
+                <th>{{ column }}</th>
             {% endfor %}
         </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+            <tr>
+                {% for k,v in row %}
+                    <td>
+                        {% if report.columns[k] is defined and report.columns[k].idOfEntities %}
+                            <a href="/by-entity/{{ report.columns[k].idOfEntities|join(',') }}/{{ v }}">{{ v }}</a>
+                        {% else %}
+                            {{ v }}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Legend</h3>
+
+    <p>
+        {{ report.description }}
+    </p>
+
+    <h3>Raw SQL</h3>
+    <pre>
+    {{ report.sql }}
+</pre>
+
+
+{% endblock content %}

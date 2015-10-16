@@ -25,11 +25,11 @@ class ReportCollection extends ImmutableArray
         )->first();
     }
 
-    public function findWithOnlyEntity($entity)
+    public function findWithOnlyOneEntity(array $entities)
     {
         $result = [];
         $this->walk(
-            function (Report $r) use ($entity, &$result) {
+            function (Report $r) use ($entities, &$result) {
                 if ([] === $r->parameters) {
                     return;
                 }
@@ -38,7 +38,7 @@ class ReportCollection extends ImmutableArray
                 }
                 /** @var Parameter $parameter */
                 $parameter = current($r->parameters);
-                if ($parameter->idOfEntity !== $entity) {
+                if (!in_array($parameter->idOfEntity, $entities, true)) {
                     return;
                 }
 
@@ -52,11 +52,11 @@ class ReportCollection extends ImmutableArray
         return $result;
     }
 
-    public function findWithEntityAndSomethingElse($entity)
+    public function findWithEntityAndSomethingElse(array $entities)
     {
         $result = [];
         $this->walk(
-            function (Report $r) use ($entity, &$result) {
+            function (Report $r) use ($entities, &$result) {
                 if ([] === $r->parameters) {
                     return;
                 }
@@ -65,7 +65,7 @@ class ReportCollection extends ImmutableArray
                 }
                 /** @var Parameter $parameter */
                 foreach ($r->parameters as $parameter) {
-                    if ($parameter->idOfEntity === $entity) {
+                    if (in_array($parameter->idOfEntity, $entities, true)) {
                         $tmp = new SearchByEntityResult;
                         $tmp->report = $r;
                         $tmp->parameter = $parameter;
