@@ -92,6 +92,7 @@ class ReportService
             $column = new Column();
             $column->name = $name;
             $column->format = $this->getRequiredValue($cData, 'format');
+            $column->chop = $this->getValue($cData, 'chop', null);
             $column->idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
 
             $report->columns[$name] = $column;

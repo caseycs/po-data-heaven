@@ -26,6 +26,8 @@
                     <td>
                         {% if report.columns[k] is defined and report.columns[k].idOfEntities %}
                             <a href="/by-entity/{{ report.columns[k].idOfEntities|join(',') }}/{{ v }}">{{ v }}</a>
+                        {% elseif report.columns[k] is defined and report.columns[k].chop %}
+                            {{ v|slice(0,report.columns[k].chop) }}
                         {% else %}
                             {{ v }}
                         {% endif %}

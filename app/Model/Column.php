@@ -8,4 +8,7 @@ class Column
 
     /** @var string */
     public $name, $format, $idOfEntities;
+
+    /** @var string */
+    public $chop;
 }
