@@ -11,7 +11,7 @@ class ServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $app['service.reports_filesystem'] = function ($name) use ($app) {
-            $adapter = new Local(__DIR__.'/../report');
+            $adapter = new Local(getenv('REPORTS_DIR'));
             $filesystem = new Filesystem($adapter);
             return $filesystem;
         };
