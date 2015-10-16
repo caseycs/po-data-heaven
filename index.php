@@ -110,9 +110,38 @@ $app->get(
             'parameters' => $parameters->all(),
             'rows' => $reportExecutionResult->rows,
             'sql' => $reportExecutionResult->sql,
+            'csvUrl' => "/report/{$baseName}/csv?" . http_build_query($reportExecutionResult->parameters),
         ];
 
         return $app['twig']->render('reportResult.twig', $templateData);
+    }
+);
+
+$app->get(
+    '/report/{baseName}/csv',
+    function ($baseName, \Symfony\Component\HttpFoundation\Request $request) use ($app) {
+        $report = $app['reports']->findOneByBaseName($baseName);
+
+        $parameters = $request->query;
+
+        /** @var \PODataHeaven\Collection\ReportExecutionResult $reportExecutionResult */
+        $reportExecutionResult = $app['service.report']->execute($report, $parameters);
+
+        //hack for Goodby\CSV
+        error_reporting(~E_STRICT);
+
+        $config = new Goodby\CSV\Export\Standard\ExporterConfig();
+        $exporter = new Goodby\CSV\Export\Standard\Exporter($config);
+
+        $date = date('m-d_h-i');
+        \utilphp\util::force_download("{$baseName}-{$date}.csv");
+
+        $rows2export = $reportExecutionResult->rows;
+        array_unshift($rows2export, array_keys($rows2export[0]));
+
+        $exporter->export('php://output', $rows2export);
+
+        return '';
     }
 );
 

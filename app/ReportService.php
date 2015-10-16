@@ -126,6 +126,7 @@ class ReportService
         $result = new ReportExecutionResult();
         $result->rows = $rows;
         $result->sql = $sql;
+        $result->parameters = $params;
 
         return $result;
     }

@@ -8,7 +8,8 @@
         "brandonwamboldt/utilphp": "~1.1",
         "bocharsky-bw/arrayzy": "0.2.*",
         "symfony/twig-bridge": "~2.7",
-        "doctrine/dbal": "~2.5"
+        "doctrine/dbal": "~2.5",
+        "goodby/csv": "~1.2"
     },
     "autoload": {
         "psr-4": {

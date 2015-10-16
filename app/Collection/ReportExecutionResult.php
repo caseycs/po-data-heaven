@@ -8,4 +8,7 @@ class ReportExecutionResult
 
     /** @var string */
     public $sql;
+
+    /** @var array */
+    public $parameters;
 }
