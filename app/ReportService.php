@@ -4,6 +4,7 @@ namespace PODataHeaven;
 use Doctrine\DBAL\Connection;
 use League\Flysystem\Filesystem;
 use PODataHeaven\Collection\ReportCollection;
+use PODataHeaven\Collection\ReportExecutionResult;
 use PODataHeaven\Exception\LimitLessThenOneException;
 use PODataHeaven\Exception\NoKeyFoundException;
 use PODataHeaven\Exception\ReportParameterRequiredException;
@@ -99,6 +100,12 @@ class ReportService
         return $report;
     }
 
+    /**
+     * @param Report $report
+     * @param ParameterBag $paramsPassed
+     * @return ReportExecutionResult
+     * @throws ReportParameterRequiredException
+     */
     public function execute(Report $report, ParameterBag $paramsPassed)
     {
         $params = [];
@@ -116,7 +123,11 @@ class ReportService
 
         $rows = $this->connection->fetchAll($sql, $params);
 
-        return $rows;
+        $result = new ReportExecutionResult();
+        $result->rows = $rows;
+        $result->sql = $sql;
+
+        return $result;
     }
 
     private function getValue(array $data, $key, $default = null)

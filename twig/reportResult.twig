@@ -11,11 +11,11 @@
         {% endfor %}
     </p>
 
-    <table class="table-condensed table-bordered">
+    <table class="table-condensed table-bordered" data-toggle="table">
         <thead>
         <tr>
             {% for column, value in rows[0] %}
-                <th>{{ column }}</th>
+                <th data-sortable="true">{{ column }}</th>
             {% endfor %}
         </tr>
         </thead>
@@ -44,7 +44,7 @@
 
     <h3>Raw SQL</h3>
     <pre>
-    {{ report.sql }}
+    {{ sql }}
 </pre>
 
 

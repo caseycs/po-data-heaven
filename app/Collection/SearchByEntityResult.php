@@ -1,11 +1,10 @@
 <?php
 namespace PODataHeaven\Collection;
 
-use Arrayzy\ImmutableArray;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
 
-class SearchByEntityResult extends ImmutableArray
+class SearchByEntityResult
 {
     /** @var Report */
     public $report;

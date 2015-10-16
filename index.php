@@ -55,6 +55,12 @@ $app->get(
         $reportsOnlyWithOnlyOneParameter = $app['reports']->findWithOnlyOneEntity($entities);
         $reportsWithOtherParameters = $app['reports']->findWithEntityAndSomethingElse($entities);
 
+        if (count($reportsOnlyWithOnlyOneParameter) === 1 && count($reportsWithOtherParameters) === 0) {
+            $first = reset($reportsOnlyWithOnlyOneParameter);
+            $url = "/report/{$first->report->baseName}/result?{$first->parameter->placeholder}={$entityId}";
+            return new \Symfony\Component\HttpFoundation\RedirectResponse($url);
+        }
+
         return $app['twig']->render(
             'byEntityId.twig',
             [
@@ -96,12 +102,14 @@ $app->get(
 
         $parameters = $request->query;
 
-        $rows = $app['service.report']->execute($report, $parameters);
+        /** @var \PODataHeaven\Collection\ReportExecutionResult $reportExecutionResult */
+        $reportExecutionResult = $app['service.report']->execute($report, $parameters);
 
         $templateData = [
             'report' => $report,
             'parameters' => $parameters->all(),
-            'rows' => $rows,
+            'rows' => $reportExecutionResult->rows,
+            'sql' => $reportExecutionResult->sql,
         ];
 
         return $app['twig']->render('reportResult.twig', $templateData);
