@@ -4,7 +4,11 @@
         "symfony/yaml": "~2.7",
         "raveren/kint": "~1.0",
         "league/flysystem": "~1.0",
-        "vlucas/phpdotenv": "~2.0"
+        "vlucas/phpdotenv": "~2.0",
+        "brandonwamboldt/utilphp": "~1.1",
+        "bocharsky-bw/arrayzy": "0.2.*",
+        "symfony/twig-bridge": "~2.7",
+        "doctrine/dbal": "~2.5"
     },
     "autoload": {
         "psr-4": {

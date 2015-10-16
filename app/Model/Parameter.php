@@ -8,7 +8,7 @@ class Parameter
     const INPUT_DATETIME = 'datetime';
 
     /** @var string */
-    public $name, $type, $idOfEntity, $default;
+    public $placeholder, $name, $input, $idOfEntity, $default;
 
     public function getDefault()
     {

@@ -17,7 +17,11 @@ class ServiceProvider implements ServiceProviderInterface
         };
 
         $app['service.report'] = function ($name) use ($app) {
-            return new ReportService($app['service.reports_filesystem']);
+            return new ReportService($app['service.reports_filesystem'], $app['db']);
+        };
+
+        $app['reports'] = function ($name) use ($app) {
+            return $app['service.report']->all();
         };
     }
 

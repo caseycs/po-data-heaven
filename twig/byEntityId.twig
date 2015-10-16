@@ -1,0 +1,18 @@
+<h1>
+    reports with entity <code>{{ entity }}</code> #<code>{{ entityId }}</code>
+</h1>
+
+<h2>Only with this entity id parameter</h2>
+<ul>
+    {% for r in reports.only %}
+        <li><a href="/report/{{ r.report.baseName }}/result?{{ r.parameter.placeholder }}={{ entityId }}">{{ r.report.name }}</a></li>
+    {% endfor %}
+</ul>
+
+<h2>With additional parameters</h2>
+<ul>
+    {% for r in reports.rest %}
+        <li><a href="/report/{{ r.report.baseName }}?{{ r.parameter.placeholder }}={{ entityId }}">{{ r.report.name }}</a></li>
+    {% endfor %}
+
+</ul>

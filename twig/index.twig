@@ -1,0 +1,10 @@
+<h1>
+    reports
+</h1>
+
+<ul>
+    {% for r in reports %}
+        <li><a href="/report/{{ r.baseName }}">{{ r.name }}</a></li>
+    {% endfor %}
+
+</ul>
