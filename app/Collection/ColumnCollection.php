@@ -5,6 +5,8 @@ use PODataHeaven\Exception\NonUniqueException;
 use PODataHeaven\Exception\NoResultException;
 use PODataHeaven\Model\Column;
 
+/* @method Column first() */
+/* @method Column offsetGet($offset) */
 class ColumnCollection extends Collection
 {
     /**

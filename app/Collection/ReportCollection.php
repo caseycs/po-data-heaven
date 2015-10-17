@@ -6,6 +6,7 @@ use Arrayzy\MutableArray;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
 
+/* @method Report first() */
 class ReportCollection extends Collection
 {
     public function sortByNameAsc()

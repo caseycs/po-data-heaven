@@ -1,9 +1,8 @@
 <?php
 namespace PODataHeaven\Model;
 
-use Arrayzy\MutableArray;
-use PODataHeaven\Collection\Collection;
 use PODataHeaven\Collection\ColumnCollection;
+use PODataHeaven\Collection\ParameterCollection;
 
 class Report
 {
@@ -19,13 +18,13 @@ class Report
     /** @var ColumnCollection|Column[] */
     public $columns = [];
 
-    /** @var MutableArray|Parameter[] */
+    /** @var ParameterCollection[] */
     public $parameters = [];
 
     public function __construct()
     {
         $this->columns = new ColumnCollection();
-        $this->parameters = new Collection();
+        $this->parameters = new ParameterCollection();
     }
 
     /**

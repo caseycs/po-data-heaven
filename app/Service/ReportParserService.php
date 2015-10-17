@@ -2,7 +2,6 @@
 namespace PODataHeaven\Service;
 
 use League\Flysystem\Filesystem;
-use PODataHeaven\Collection\ReportCollection;
 use PODataHeaven\Container\ReportTreeNode;
 use PODataHeaven\Exception\LimitLessThenOneException;
 use PODataHeaven\Exception\NoKeyFoundException;
@@ -17,19 +16,9 @@ class ReportParserService
     /** @var ReportTreeNode */
     private $reportsTreeRoot;
 
-    public function __construct(Filesystem $reportsFs)
+    public function __construct(Filesystem $fs)
     {
-        $this->reports = new ReportCollection;
-
-        foreach ($reportsFs->listContents() as $ymlFileMetadata) {
-            if (substr($ymlFileMetadata['path'], -4) !== '.yml') {
-                continue;
-            }
-
-            $yml = $reportsFs->read($ymlFileMetadata['path']);
-            $data = Yaml::parse($yml);
-            $this->reports->push($this->buildReport($ymlFileMetadata['path'], $data));
-        }
+        $this->fs = $fs;
     }
 
     /**
@@ -37,13 +26,37 @@ class ReportParserService
      */
     public function getReportsTree()
     {
+        if (null === $this->reportsTreeRoot) {
+            $this->parseReports();
+        }
         return $this->reportsTreeRoot;
+    }
+
+    /**
+     * @throws ReportYmlInvalidException
+     */
+    private function parseReports()
+    {
+        $this->reportsTreeRoot = new ReportTreeNode;
+
+        foreach ($this->fs->listContents() as $ymlFileMetadata) {
+            if (substr($ymlFileMetadata['path'], -4) !== '.yml') {
+                continue;
+            }
+
+            $yml = $this->fs->read($ymlFileMetadata['path']);
+            $data = Yaml::parse($yml);
+
+            $report = $this->buildReport($ymlFileMetadata['path'], $data);
+
+            $this->reportsTreeRoot->reports->add($report);
+        }
     }
 
     /**
      * @param array $data
      * @return Report
-     * @throws \Exception
+     * @throws ReportYmlInvalidException
      */
     private function buildReport($path, array $data)
     {
@@ -62,7 +75,7 @@ class ReportParserService
             $report->limit = $limit;
 
             $report->order = $this->getRequiredValue($data, 'order');
-            $report->orientation = $this->getRequiredValue($data, 'orientation');
+            $report->orientation = $this->getValue($data, 'orientation', Report::ORIENTATION_VERTICAL);
         } catch (LimitLessThenOneException $e) {
             throw new ReportYmlInvalidException($path, $e);
         } catch (NoKeyFoundException $e) {
@@ -77,7 +90,7 @@ class ReportParserService
             $parameter->idOfEntity = $this->getValue($pData, 'idOfEntity');
             $parameter->default = $this->getValue($pData, 'default');
 
-            $report->parameters->push($parameter);
+            $report->parameters->add($parameter);
         }
 
         foreach ($this->getValue($data, 'columns', []) as $name => $cData) {
@@ -87,17 +100,29 @@ class ReportParserService
             $column->chop = $this->getValue($cData, 'chop', null);
             $column->idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
 
-            $report->columns->offsetSet($name, $column);
+            $report->columns->add($column);
         }
 
         return $report;
     }
 
+    /**
+     * @param array $data
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
     private function getValue(array $data, $key, $default = null)
     {
         return isset($data[$key]) ? $data[$key] : $default;
     }
 
+    /**
+     * @param array $data
+     * @param string $key
+     * @return mixed
+     * @throws NoKeyFoundException
+     */
     private function getRequiredValue(array $data, $key)
     {
         if (!isset($data[$key]) || '' === trim($data[$key])) {
