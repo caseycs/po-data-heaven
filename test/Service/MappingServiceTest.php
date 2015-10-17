@@ -105,7 +105,6 @@ class MappingServiceTest extends PHPUnit_Framework_TestCase
         $report = new Report();
         $report->columns->add($column);
 
-
         $reportResult = new ReportExecutionResult();
         $reportResult->rows = [['user_id' => 55]];
         $this->mappingService->generateResultColumns($report, $reportResult);
