@@ -3,4 +3,4 @@
 vendor/
 composer.lock
 reports
-test.db
+test.sqlite
