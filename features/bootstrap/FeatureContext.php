@@ -19,7 +19,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         $path = realpath(__DIR__ . '/../../test.sqlite');
 
-        if (isset($path)) {
+        if (is_file($path)) {
             unlink($path);
         }
 
