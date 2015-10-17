@@ -6,7 +6,7 @@ use PHPUnit_Extensions_Database_DataSet_IDataSet;
 use PHPUnit_Extensions_Database_DataSet_YamlDataSet;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
 use PHPUnit_Extensions_Database_TestCase_Trait;
-use PODataHeaven\PoDataHaven;
+use PODataHeaven\PoDataHavenApplication;
 use Silex\WebTestCase as SilexWebTestCase;
 
 abstract class WebTestCase extends SilexWebTestCase
@@ -25,11 +25,11 @@ abstract class WebTestCase extends SilexWebTestCase
     }
 
     /**
-     * @return PoDataHaven
+     * @return PoDataHavenApplication
      */
     public function createApplication()
     {
-        $app = new PoDataHaven(__DIR__);
+        $app = new PoDataHavenApplication(__DIR__);
 
         $app['debug'] = true;
         unset($app['exception_handler']);

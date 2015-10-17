@@ -8,7 +8,7 @@ use PODataHeaven\ServiceProvider\EnvironmentProvider;
 use PODataHeaven\ServiceProvider\RoutesProvider;
 use Silex\Application;
 
-class PoDataHaven extends Application
+class PoDataHavenApplication extends Application
 {
     public function __construct($dotEnvDir)
     {
