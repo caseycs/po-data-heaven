@@ -11,19 +11,31 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 {
     public function __construct()
     {
+        $this->prepareConfig();
         $this->prepareDatabase();
         $this->prepareMink();
     }
 
+    protected function prepareConfig()
+    {
+        $pathRoot = realpath(__DIR__ . '/../../../');
+        $pathSqlite = $pathRoot . '/test.sqlite';
+
+        putenv('DB_DRIVER=pdo_sqlite');
+        putenv('DB_PATH=' . $pathSqlite);
+        putenv("REPORTS_DIR={$pathRoot}/tests/resources/reports");
+        putenv("MAPPINGS_DIR={$pathRoot}/tests/resources/mappings");
+    }
+
     protected function prepareDatabase()
     {
-        $path = __DIR__ . '/../../test.sqlite';
+        $pathSqlite = getenv('DB_PATH');
 
-        if (is_file($path)) {
-            unlink($path);
+        if (is_file($pathSqlite)) {
+            unlink($pathSqlite);
         }
 
-        $pdo = new PDO('sqlite:' . $path);
+        $pdo = new PDO('sqlite:' . $pathSqlite);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $pdo->exec('create table `messages` (`id` int, `user_id` int, `content` varchar(50))');
@@ -39,7 +51,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     protected function prepareMink()
     {
-        $app = new \PODataHeaven\PoDataHavenApplication(__DIR__ . '/../../test');
+        $app = new \PODataHeaven\PoDataHavenApplication;
         $app['debug'] = false;
         unset($app['exception_handler']);
 

@@ -1,7 +1,6 @@
 <?php
 namespace PODataHeaven;
 
-use Dotenv\Dotenv;
 use PODataHeaven\ServiceProvider\ApplicationProvider;
 use PODataHeaven\ServiceProvider\ControllerProvider;
 use PODataHeaven\ServiceProvider\EnvironmentProvider;
@@ -10,20 +9,15 @@ use Silex\Application;
 
 class PoDataHavenApplication extends Application
 {
-    public function __construct($dotEnvDir)
+    public function __construct()
     {
         parent::__construct();
 
-        $this['debug'] = true;
-
-        $dotenv = new Dotenv($dotEnvDir);
-        $dotenv->load();
-        $dotenv->required(['DB_DRIVER']);
+        $this['debug'] = getenv('APP_DEBUG');
 
         $this->register(new EnvironmentProvider());
         $this->register(new ApplicationProvider());
         $this->register(new ControllerProvider());
-        $this->register(new RoutesProvider()
-        );
+        $this->register(new RoutesProvider());
     }
 }
