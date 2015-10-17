@@ -5,12 +5,20 @@ use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Behat\MinkExtension\Context\MinkContext;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
 use Symfony\Component\HttpKernel\Client;
 
 class FeatureContext extends MinkContext implements Context, SnippetAcceptingContext
 {
+    /** @var Filesystem */
+    private $testResourcesFs;
+
     public function __construct()
     {
+        $adapter = new Local(__DIR__ . '/../../resources');
+        $this->testResourcesFs = new Filesystem($adapter);
+
         $this->prepareConfig();
         $this->prepareDatabase();
         $this->prepareMink();
@@ -60,5 +68,37 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         $mink = new Mink(['silex' => $session]);
         $mink->setDefaultSessionName('silex');
         $this->setMink($mink);
+    }
+
+    /**
+     * @Given /^ensure YAML report with parse error presented$/
+     */
+    public function ensureYAMLReportWithParseErrorPresented()
+    {
+        $this->testResourcesFs->copy('invalid.yml', 'reports/invalid.yml');
+    }
+
+    /**
+     * @Given /^ensure YAML report with parse error removed/
+     */
+    public function ensureYAMLReportWithParseErrorRemoved()
+    {
+        $this->testResourcesFs->delete('reports/invalid.yml');
+    }
+
+    /**
+     * @Given /^ensure YAML report with logic error presented$/
+     */
+    public function ensureYAMLReportWithLogicErrorPresented()
+    {
+        $this->testResourcesFs->copy('report-with-logic-error.yml', 'reports/report-with-logic-error.yml');
+    }
+
+    /**
+     * @Given /^ensure YAML report with logic error removed/
+     */
+    public function ensureYAMLReportWithLogicErrorRemoved()
+    {
+        $this->testResourcesFs->delete('reports/report-with-logic-error.yml');
     }
 }

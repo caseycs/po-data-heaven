@@ -2,13 +2,24 @@
 
 {% block content %}
 
-<h2>All reports</h2>
+    {% if failedReports %}
+        <div class="alert alert-warning" role="alert">
+            Reports parsing failed:
+            <ul>
+                {% for report, error in failedReports %}
+                    <li><strong>{{ report }}</strong> &mdash; {{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 
-<ul>
-    {% for r in reports %}
-        <li><a href="/report/{{ r.baseName }}">{{ r.name }}</a></li>
-    {% endfor %}
+    <h2>All reports</h2>
 
-</ul>
+    <ul>
+        {% for r in reports %}
+            <li><a href="/report/{{ r.baseName }}">{{ r.name }}</a></li>
+        {% endfor %}
+
+    </ul>
 
 {% endblock %}

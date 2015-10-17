@@ -5,16 +5,21 @@ use League\Flysystem\Filesystem;
 use PODataHeaven\Container\ReportTreeNode;
 use PODataHeaven\Exception\LimitLessThenOneException;
 use PODataHeaven\Exception\NoKeyFoundException;
+use PODataHeaven\Exception\PODataHeavenException;
 use PODataHeaven\Exception\ReportYmlInvalidException;
 use PODataHeaven\Model\Column;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 class ReportParserService
 {
     /** @var ReportTreeNode */
     private $reportsTreeRoot;
+
+    /** @var array */
+    private $failedReports = [];
 
     public function __construct(Filesystem $fs)
     {
@@ -45,11 +50,16 @@ class ReportParserService
             }
 
             $yml = $this->fs->read($ymlFileMetadata['path']);
-            $data = Yaml::parse($yml);
 
-            $report = $this->buildReport($ymlFileMetadata['path'], $data);
-
-            $this->reportsTreeRoot->reports->add($report);
+            try {
+                $data = Yaml::parse($yml);
+                $report = $this->buildReport($ymlFileMetadata['path'], $data);
+                $this->reportsTreeRoot->reports->add($report);
+            } catch (ParseException $e) {
+                $this->failedReports[$ymlFileMetadata['path']] = $e->getMessage();
+            } catch (PODataHeavenException $e) {
+                $this->failedReports[$ymlFileMetadata['path']] = $e->getMessage();
+            }
         }
     }
 
@@ -88,6 +98,8 @@ class ReportParserService
         }
 
         foreach ($this->getValue($data, 'parameters', []) as $placeholder => $pData) {
+            $pData = (array)$pData;
+
             $parameter = new Parameter();
             $parameter->placeholder = $placeholder;
             $parameter->name = $this->getRequiredValue($pData, 'name');
@@ -144,5 +156,16 @@ class ReportParserService
             throw new NoKeyFoundException($key);
         }
         return $data[$key];
+    }
+
+    /**
+     * @return array
+     */
+    public function getFailedReports()
+    {
+        if (null === $this->reportsTreeRoot) {
+            $this->parseReports();
+        }
+        return $this->failedReports;
     }
 }

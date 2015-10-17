@@ -1,9 +1,7 @@
 <?php
 namespace PODataHeaven\Exception;
 
-use Exception;
-
-class NoKeyFoundException extends Exception
+class NoKeyFoundException extends PODataHeavenException
 {
     public $key;
 

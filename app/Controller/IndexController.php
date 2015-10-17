@@ -26,7 +26,8 @@ class IndexController
     public function action()
     {
         $data = [
-            'reports' => $this->reportParserService->getReportsTree()->reports
+            'failedReports' => $this->reportParserService->getFailedReports(),
+            'reports' => $this->reportParserService->getReportsTree()->reports,
         ];
 
         return $this->twig->render('index.twig', $data);

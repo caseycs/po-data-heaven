@@ -1,9 +1,7 @@
 <?php
 namespace PODataHeaven\Exception;
 
-use Exception;
-
-class ReportYmlInvalidException extends Exception
+class ReportYmlInvalidException extends PODataHeavenException
 {
     public $report;
 

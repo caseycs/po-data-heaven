@@ -1,9 +1,7 @@
 <?php
 namespace PODataHeaven\Exception;
 
-use Exception;
-
-class ReportParameterRequiredException extends Exception
+class ReportParameterRequiredException extends PODataHeavenException
 {
     public $placeholder;
 

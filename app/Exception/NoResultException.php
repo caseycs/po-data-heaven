@@ -1,8 +1,6 @@
 <?php
 namespace PODataHeaven\Exception;
 
-use Exception;
-
-class NoResultException extends Exception
+class NoResultException extends PODataHeavenException
 {
 }

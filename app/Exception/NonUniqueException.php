@@ -1,8 +1,6 @@
 <?php
 namespace PODataHeaven\Exception;
 
-use Exception;
-
-class NonUniqueException extends Exception
+class NonUniqueException extends PODataHeavenException
 {
 }
