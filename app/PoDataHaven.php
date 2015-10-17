@@ -12,32 +12,23 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Twig_Filter_Function;
 
-class PoDataHaven
+class PoDataHaven extends Application
 {
-    /**
-     * @var Application
-     */
-    private $app;
-
-    /**
-     * @param string $dotEnvDir
-     * @param string $reportsDir
-     * @param string $mappingsDir
-     */
-    public function __construct($dotEnvDir, $reportsDir, $mappingsDir)
+    public function __construct($dotEnvDir)
     {
+        parent::__construct();
+
         $dotenv = new Dotenv($dotEnvDir);
         $dotenv->load();
 
         $dotenv->required(['MYSQL_HOST', 'MYSQL_PORT', 'MYSQL_DBNAME', 'MYSQL_USER', 'MYSQL_PASSWORD']);
 
-        $app = new Application();
-        $app['debug'] = true;
+        $this['debug'] = true;
 
-        $app->register(new TwigServiceProvider(),['twig.path' => __DIR__ . '/../twig']);
+        $this->register(new TwigServiceProvider(),['twig.path' => __DIR__ . '/../twig']);
 
         /** @var \Twig_Environment $te */
-        $te = $app['twig'];
+        $te = $this['twig'];
         $te->addFilter(
             'sqlFormatter',
             new Twig_Filter_Function(
@@ -59,24 +50,21 @@ class PoDataHaven
             ],
         ];
 
-        $app->register(new DoctrineServiceProvider(), $dbParams);
+        $this->register(new DoctrineServiceProvider(), $dbParams);
 
-        $app->register(new ServiceProvider());
+        $this->register(new ServiceProvider());
 
-        $app->get(
+        $app = $this;
+
+        $this->get(
             '/',
             function () use ($app) {
-//    ddd($app['reports']);
-                return $app['twig']->render(
-                    'index.twig',
-                    [
-                        'reports' => $app['reports'],
-                    ]
-                );
+                $data = ['reports' => $app['service.report_parser']->getReportsTree()->reports];
+                return $app['twig']->render('index.twig', $data);
             }
         );
 
-        $app->get(
+        $this->get(
             '/by-entity/{entities}/{entityId}',
             function ($entities, $entityId) use ($app) {
 
@@ -105,7 +93,7 @@ class PoDataHaven
             }
         );
 
-        $app->get(
+        $this->get(
             '/report/{baseName}',
             function ($baseName, Request $request) use ($app) {
                 /** @var \PODataHeaven\Model\Report $report */
@@ -125,7 +113,7 @@ class PoDataHaven
             }
         );
 
-        $app->get(
+        $this->get(
             '/report/{baseName}/result',
             function ($baseName, Request $request) use ($app) {
                 $report = $app['reports']->findOneByBaseName($baseName);
@@ -147,7 +135,7 @@ class PoDataHaven
             }
         );
 
-        $app->get(
+        $this->get(
             '/report/{baseName}/csv',
             function ($baseName, Request $request) use ($app) {
                 $report = $app['reports']->findOneByBaseName($baseName);
@@ -175,18 +163,11 @@ class PoDataHaven
             }
         );
 
-        $app->get(
+        $this->get(
             '/reports/tag/{tag}',
             function ($tag) use ($app) {
                 return 'tag ' . $app->escape($tag);
             }
         );
-
-        $this->app = $app;
-    }
-
-    public function run()
-    {
-        $this->app->run();
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit bootstrap="phpunit.bootstrap.php" colors="true">
+<phpunit bootstrap="test/phpunit.bootstrap.php" colors="true">
     <listeners>
         <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
     </listeners>

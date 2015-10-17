@@ -7,7 +7,7 @@ use PODataHeaven\Exception\ReportParameterRequiredException;
 use PODataHeaven\Model\Report;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ReportExecutor
+class ReportExecutorService
 {
     /** @var Connection  */
     private $connection;

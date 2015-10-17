@@ -1,8 +1,6 @@
 <?php
 namespace PODataHeaven\Collection;
 
-use Arrayzy\ImmutableArray;
-use Arrayzy\MutableArray;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
 
@@ -16,6 +14,7 @@ class ReportCollection extends Collection
 //                return strcmp($a->name, $b->name);
 //            }
 //        );
+        return $this;
     }
 
     public function findOneByBaseName($baseName)

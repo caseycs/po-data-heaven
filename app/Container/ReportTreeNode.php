@@ -1,12 +1,12 @@
 <?php
 namespace PODataHeaven\Container;
 
-use Arrayzy\MutableArray;
+use PODataHeaven\Collection\Collection;
 use PODataHeaven\Collection\ReportCollection;
 
 class ReportTreeNode
 {
-    /** @var MutableArray|ReportTreeNode[] */
+    /** @var Collection */
     public $children;
 
     /** @var ReportCollection */
@@ -14,7 +14,7 @@ class ReportTreeNode
 
     public function __construct()
     {
-        $this->children = new MutableArray();
+        $this->children = new Collection();
         $this->reports = new ReportCollection();
     }
 }
