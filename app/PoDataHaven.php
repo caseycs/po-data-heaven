@@ -12,7 +12,7 @@ use Silex\Provider\TwigServiceProvider;
 use SqlFormatter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Twig_Filter_Function;
+use Twig_SimpleFilter;
 
 class PoDataHaven extends Application
 {
@@ -31,14 +31,8 @@ class PoDataHaven extends Application
 
         /** @var \Twig_Environment $te */
         $te = $this['twig'];
-        $te->addFilter(
-            'sqlFormatter',
-            new Twig_Filter_Function(
-                function ($a) {
-                    return SqlFormatter::format($a, true);
-                }
-            )
-        );
+        $filter = function ($a) {return SqlFormatter::format($a, true);};
+        $te->addFilter(new Twig_SimpleFilter('sqlFormatter', $filter));
 
         $dbParams = [
             'db.options' => [
