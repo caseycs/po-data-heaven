@@ -10,7 +10,7 @@ class Report
     const ORIENTATION_HORIZONTAL = 'horizontal';
 
     /** @var string */
-    public $baseName, $name, $description, $sql, $order, $orientation;
+    public $filename, $baseName, $name, $description, $sql, $order, $orientation;
 
     /** @var int */
     public $limit;

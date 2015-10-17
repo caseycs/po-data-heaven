@@ -2,8 +2,12 @@
 
 {% block content %}
 
-    <h2>Report: <code>{{ report.name }}</code></h2>
-
+    <h2>
+        Report: <code>{{ report.name }}</code>
+        <a href="{{ editReportUrlPrefix }}{{ report.filename }}" target="_blank" title="Edit">
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true" style="font-size:.6em"></span>
+        </a>
+    </h2>
 
     <h3>Legend</h3>
 
@@ -26,7 +30,7 @@
         {% endfor %}
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-default">Generate</button>
+                <button type="submit" class="btn btn-default btn-primary">Generate</button>
             </div>
         </div>
     </form>

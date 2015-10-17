@@ -73,6 +73,7 @@ class ReportParserService
         $report = new Report();
 
         try {
+            $report->filename = $path;
             $report->baseName = substr($path, 0, -4);
             $report->name = $this->getRequiredValue($data, 'name');
             $report->description = $this->getRequiredValue($data, 'description');
