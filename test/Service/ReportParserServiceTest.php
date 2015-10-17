@@ -63,10 +63,7 @@ order: id ASC');
         $this->filesystem->put('first-report.yml', 'name: test1
 description: bla bla bla
 sql: >
- SELECT * FROM `address` WHERE id = :id
-
-limit: 20
-order: id ASC');
+ SELECT * FROM `address` WHERE id = :id');
 
         $tree = $this->service->getReportsTree();
         $report = $tree->reports->first();
@@ -75,12 +72,42 @@ order: id ASC');
         $this->assertSame('first-report', $report->baseName);
         $this->assertSame('bla bla bla', $report->description);
         $this->assertSame(Report::ORIENTATION_VERTICAL, $report->orientation);
-        $this->assertSame(20, $report->limit);
-        $this->assertSame('id ASC', $report->order);
+        $this->assertSame(null, $report->order);
+        $this->assertSame(null, $report->limit);
         $this->assertSame('SELECT * FROM `address` WHERE id = :id', trim($report->sql));
 
         $this->assertSame(false, $report->isHorizontal());
         $this->assertSame(true, $report->isVertical());
+    }
+
+    public function test_getReportsTree_limitMapping()
+    {
+        $this->filesystem->put('first-report.yml', 'name: test1
+description: bla bla bla
+sql: >
+ SELECT * FROM `address` WHERE id = :id
+
+limit: 20');
+
+        $tree = $this->service->getReportsTree();
+        $report = $tree->reports->first();
+
+        $this->assertSame(20, $report->limit);
+    }
+
+    public function test_getReportsTree_orderMapping()
+    {
+        $this->filesystem->put('first-report.yml', 'name: test1
+description: bla bla bla
+sql: >
+ SELECT * FROM `address` WHERE id = :id
+
+order: id ASC');
+
+        $tree = $this->service->getReportsTree();
+        $report = $tree->reports->first();
+
+        $this->assertSame('id ASC', $report->order);
     }
 
     public function test_getReportsTree_ParameterMapping()

@@ -7,7 +7,10 @@ class Column
     const FORMAT_NUMBER = 'number';
 
     /** @var string */
-    public $name, $format, $idOfEntities;
+    public $name, $format = self::FORMAT_RAW;
+
+    /** @var array */
+    public $idOfEntities = [];
 
     /** @var string */
     public $chop;

@@ -2,7 +2,7 @@
 namespace PODataHeaven\Service;
 
 use Doctrine\DBAL\Connection;
-use PODataHeaven\Collection\ReportExecutionResult;
+use PODataHeaven\Container\ReportExecutionResult;
 use PODataHeaven\Exception\ReportParameterRequiredException;
 use PODataHeaven\Model\Report;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -46,10 +46,7 @@ class ReportExecutorService
         $result->parameters = $params;
         $result->sql = $this->postProcessSql($sql, $params);
 
-        //build report mapping
-        if (count($result->rows)) {
-            $this->mappingService->applyToReport(array_keys(reset($result->rows)), $report);
-        }
+        $this->mappingService->generateResultColumns($report, $result);
 
         return $result;
     }
@@ -76,8 +73,14 @@ class ReportExecutorService
     {
         $sql = $report->sql;
 
-        $sql .= ' ORDER BY ' . $report->order;
-        $sql .= ' LIMIT ' . $report->limit;
+        if (null !== $report->order) {
+            $sql .= ' ORDER BY ' . $report->order;
+        }
+
+        if (null !== $report->limit) {
+            $sql .= ' LIMIT ' . $report->limit;
+        }
+
         return $sql;
     }
 }

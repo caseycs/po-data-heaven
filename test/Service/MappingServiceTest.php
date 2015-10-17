@@ -4,6 +4,7 @@ namespace PODataHeaven\Test\Service;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use PHPUnit_Framework_TestCase;
+use PODataHeaven\Container\ReportExecutionResult;
 use PODataHeaven\Model\Column;
 use PODataHeaven\Model\Report;
 use PODataHeaven\Service\MappingService;
@@ -62,55 +63,58 @@ class MappingServiceTest extends PHPUnit_Framework_TestCase
         $this->assertSame(['user', 'consumer'], $mappings->offsetGet('user_id'));
     }
 
-    public function test_applyToReport_newColumn()
+    public function test_generateResultColumns_createDefaultColumn()
+    {
+        $report = new Report();
+        $reportResult = new ReportExecutionResult();
+        $reportResult->rows = [['user_id' => 55]];
+        $this->mappingService->generateResultColumns($report, $reportResult);
+
+        $this->assertSame(1, $reportResult->columns->count());
+
+        $column = new Column;
+        $column->name = 'user_id';
+        $this->assertEquals($column, $reportResult->columns->first());
+    }
+
+    public function test_generateResultColumns_addColumnFromMapping()
     {
         $this->filesystem->put('first.yml', 'user_id: [user]');
 
         $report = new Report();
-        $this->mappingService->applyToReport(['user_id', 'data'], $report);
+        $reportResult = new ReportExecutionResult();
+        $reportResult->rows = [['user_id' => 55]];
+        $this->mappingService->generateResultColumns($report, $reportResult);
 
-        $this->assertCount(1, $report->columns);
+        $this->assertSame(1, $reportResult->columns->count());
 
-        $column = new Column();
+        $column = new Column;
         $column->name = 'user_id';
-        $column->format = Column::FORMAT_RAW;
         $column->idOfEntities = ['user'];
-        $this->assertEquals($column, $report->columns->first());
+        $this->assertEquals($column, $reportResult->columns->first());
     }
 
-    public function test_applyToReport_existedColumn()
+    public function test_generateResultColumns_updateMappingOfDefinedColumn()
     {
         $this->filesystem->put('first.yml', 'user_id: [user]');
 
         $column = new Column();
         $column->name = 'user_id';
-        $column->format = Column::FORMAT_RAW;
-        $column->idOfEntities = ['user'];
+        $column->idOfEntities = ['consumer'];
 
         $report = new Report();
         $report->columns->add($column);
 
-        $this->mappingService->applyToReport(['user_id', 'data'], $report);
 
-        $this->assertCount(1, $report->columns);
-        $this->assertSame($column, $report->columns->first());
-    }
+        $reportResult = new ReportExecutionResult();
+        $reportResult->rows = [['user_id' => 55]];
+        $this->mappingService->generateResultColumns($report, $reportResult);
 
-    public function test_applyToReport_noMatch()
-    {
-        $this->filesystem->put('first.yml', 'user_id: [user]');
+        $this->assertSame(1, $reportResult->columns->count());
 
-        $column = new Column();
-        $column->name = 'order_id';
-        $column->format = Column::FORMAT_RAW;
-        $column->idOfEntities = ['order'];
-
-        $report = new Report();
-        $report->columns->add($column);
-
-        $this->mappingService->applyToReport(['order_id', 'data'], $report);
-
-        $this->assertCount(1, $report->columns);
-        $this->assertSame($column, $report->columns->first());
+        $column = new Column;
+        $column->name = 'user_id';
+        $column->idOfEntities = ['consumer', 'user'];
+        $this->assertEquals($column, $reportResult->columns->first());
     }
 }

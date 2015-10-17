@@ -7,31 +7,31 @@
     <h3>Parameters</h3>
     <p>
         {% for p in report.parameters %}
-            {{ p.name }}: {{ parameters[p.placeholder] }}<br/>
+            {{ p.name }}: {{ result.parameters[p.placeholder] }}<br/>
         {% endfor %}
     </p>
 
-    {% if rows %}
+    {% if result.rows %}
 
         <table class="table-condensed table-bordered" data-toggle="table">
             <thead>
             <tr>
-                {% for column, value in rows[0] %}
-                    <th data-sortable="true">{{ column }}</th>
+                {% for column in result.columns %}
+                    <th data-sortable="true">{{ column.name }}</th>
                 {% endfor %}
             </tr>
             </thead>
             <tbody>
-            {% for row in rows %}
+            {% for row in result.rows %}
                 <tr>
-                    {% for k,v in row %}
+                    {% for c in result.columns %}
                         <td>
-                            {% if report.columns[k] is defined and report.columns[k].idOfEntities %}
-                                <a href="/by-entity/{{ report.columns[k].idOfEntities|join(',') }}/{{ v }}">{{ v }}</a>
-                            {% elseif report.columns[k] is defined and report.columns[k].chop %}
-                                {{ v|slice(0,report.columns[k].chop) }}
+                            {% if c.idOfEntities %}
+                                <a href="/by-entity/{{ c.idOfEntities|join(',') }}/{{ row[c.name] }}">{{ row[c.name] }}</a>
+                            {% elseif c.chop %}
+                                {{ row[c.name]|slice(0, c.chop) }}
                             {% else %}
-                                {{ v }}
+                                {{ row[c.name] }}
                             {% endif %}
                         </td>
                     {% endfor %}
@@ -53,7 +53,6 @@
     </p>
 
     <h3>Raw SQL</h3>
-    {{ sql|sqlFormatter|raw }}
-
+    {{ result.sql|sqlFormatter|raw }}
 
 {% endblock content %}

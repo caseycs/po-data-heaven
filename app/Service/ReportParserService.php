@@ -68,13 +68,18 @@ class ReportParserService
             $report->description = $this->getRequiredValue($data, 'description');
             $report->sql = $this->getRequiredValue($data, 'sql');
 
-            $limit = (int)$this->getRequiredValue($data, 'limit');
-            if ($limit < 1) {
-                throw new LimitLessThenOneException;
+            if ($this->hasValue($data, 'limit')) {
+                $limit = (int)$this->getValue($data, 'limit');
+                if ($limit < 1) {
+                    throw new LimitLessThenOneException;
+                }
+                $report->limit = $limit;
             }
-            $report->limit = $limit;
 
-            $report->order = $this->getRequiredValue($data, 'order');
+            if ($this->hasValue($data, 'order')) {
+                $report->order = $this->getValue($data, 'order');
+            }
+
             $report->orientation = $this->getValue($data, 'orientation', Report::ORIENTATION_VERTICAL);
         } catch (LimitLessThenOneException $e) {
             throw new ReportYmlInvalidException($path, $e);
@@ -115,6 +120,16 @@ class ReportParserService
     private function getValue(array $data, $key, $default = null)
     {
         return isset($data[$key]) ? $data[$key] : $default;
+    }
+
+    /**
+     * @param array $data
+     * @param string $key
+     * @return bool
+     */
+    private function hasValue(array $data, $key)
+    {
+        return isset($data[$key]);
     }
 
     /**

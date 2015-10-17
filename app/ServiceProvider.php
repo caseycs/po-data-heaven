@@ -36,18 +36,6 @@ class ServiceProvider implements ServiceProviderInterface
         $app['service.report_executor'] = function () use ($app) {
             return new ReportExecutorService($app['db'], $app['service.mapping']);
         };
-
-//        $app['service.report'] = function () use ($app) {
-//            return new ReportService(
-//                $app['service.reports_filesystem'],
-//                $app['service.mappings_filesystem'],
-//                $app['db']
-//            );
-//        };
-
-//        $app['reports'] = function () use ($app) {
-//            return $app['service.report']->all();
-//        };
     }
 
     public function boot(Application $app)

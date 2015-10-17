@@ -15,7 +15,7 @@ class ColumnCollection extends Collection
      * @throws NoResultException
      * @throws NonUniqueException
      */
-    public function findByName($name)
+    public function findOneByName($name)
     {
         return $this->findOne(function(Column $a) use ($name) {return $a->name === $name;});
     }

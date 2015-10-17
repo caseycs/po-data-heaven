@@ -4,6 +4,8 @@ namespace PODataHeaven;
 use Dotenv\Dotenv;
 use Goodby\CSV\Export\Standard\Exporter;
 use Goodby\CSV\Export\Standard\ExporterConfig;
+use PODataHeaven\Collection\ReportCollection;
+use PODataHeaven\Service\ReportExecutorService;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\TwigServiceProvider;
@@ -65,41 +67,15 @@ class PoDataHaven extends Application
         );
 
         $this->get(
-            '/by-entity/{entities}/{entityId}',
-            function ($entities, $entityId) use ($app) {
-
-                $entities = array_filter(explode(',', $entities));
-
-                $reportsOnlyWithOnlyOneParameter = $app['reports']->findWithOnlyOneEntity($entities);
-                $reportsWithOtherParameters = $app['reports']->findWithEntityAndSomethingElse($entities);
-
-                if (count($reportsOnlyWithOnlyOneParameter) === 1 && count($reportsWithOtherParameters) === 0) {
-                    $first = reset($reportsOnlyWithOnlyOneParameter);
-                    $url = "/report/{$first->report->baseName}/result?{$first->parameter->placeholder}={$entityId}";
-                    return new RedirectResponse($url);
-                }
-
-                return $app['twig']->render(
-                    'byEntityId.twig',
-                    [
-                        'entities' => $entities,
-                        'entityId' => $entityId,
-                        'reports' => [
-                            'only' => $reportsOnlyWithOnlyOneParameter,
-                            'rest' => $reportsWithOtherParameters,
-                        ]
-                    ]
-                );
-            }
-        );
-
-        $this->get(
             '/report/{baseName}',
             function ($baseName, Request $request) use ($app) {
-                /** @var \PODataHeaven\Model\Report $report */
-                $report = $app['reports']->findOneByBaseName($baseName);
+                $parameters = $request->query;
 
-                if ([] === $report->parameters) {
+                /** @var ReportCollection $reports */
+                $reports = $app['service.report_parser']->getReportsTree()->reports;
+                $report = $reports->findOneByBaseName($baseName);
+
+                if (!$report->parameters->count()) {
                     return new RedirectResponse("/report/{$baseName}/result");
                 }
 
@@ -116,18 +92,19 @@ class PoDataHaven extends Application
         $this->get(
             '/report/{baseName}/result',
             function ($baseName, Request $request) use ($app) {
-                $report = $app['reports']->findOneByBaseName($baseName);
-
                 $parameters = $request->query;
 
-                /** @var \PODataHeaven\Collection\ReportExecutionResult $reportExecutionResult */
-                $reportExecutionResult = $app['service.report']->execute($report, $parameters);
+                /** @var ReportCollection $reports */
+                $reports = $app['service.report_parser']->getReportsTree()->reports;
+                $report = $reports->findOneByBaseName($baseName);
+
+                /** @var ReportExecutorService $executor */
+                $executor = $app['service.report_executor'];
+                $reportExecutionResult = $executor->execute($report, $parameters);
 
                 $templateData = [
                     'report' => $report,
-                    'parameters' => $parameters->all(),
-                    'rows' => $reportExecutionResult->rows,
-                    'sql' => $reportExecutionResult->sql,
+                    'result' => $reportExecutionResult,
                     'csvUrl' => "/report/{$baseName}/csv?" . http_build_query($reportExecutionResult->parameters),
                 ];
 
@@ -138,12 +115,15 @@ class PoDataHaven extends Application
         $this->get(
             '/report/{baseName}/csv',
             function ($baseName, Request $request) use ($app) {
-                $report = $app['reports']->findOneByBaseName($baseName);
-
                 $parameters = $request->query;
 
-                /** @var \PODataHeaven\Collection\ReportExecutionResult $reportExecutionResult */
-                $reportExecutionResult = $app['service.report']->execute($report, $parameters);
+                /** @var ReportCollection $reports */
+                $reports = $app['service.report_parser']->getReportsTree()->reports;
+                $report = $reports->findOneByBaseName($baseName);
+
+                /** @var ReportExecutorService $executor */
+                $executor = $app['service.report_executor'];
+                $reportExecutionResult = $executor->execute($report, $parameters);
 
                 //hack for Goodby\CSV
                 error_reporting(~E_STRICT);
@@ -164,9 +144,34 @@ class PoDataHaven extends Application
         );
 
         $this->get(
-            '/reports/tag/{tag}',
-            function ($tag) use ($app) {
-                return 'tag ' . $app->escape($tag);
+            '/by-entity/{entities}/{entityId}',
+            function ($entities, $entityId) use ($app) {
+
+                /** @var ReportCollection $reports */
+                $reports = $app['service.report_parser']->getReportsTree()->reports;
+
+                $entities = array_filter(explode(',', $entities));
+
+                $reportsOnlyWithOnlyOneParameter = $reports->findWithOnlyOneEntity($entities);
+                $reportsWithOtherParameters = $reports->findWithEntityAndSomethingElse($entities);
+
+                if (count($reportsOnlyWithOnlyOneParameter) === 1 && count($reportsWithOtherParameters) === 0) {
+                    $first = reset($reportsOnlyWithOnlyOneParameter);
+                    $url = "/report/{$first->report->baseName}/result?{$first->parameter->placeholder}={$entityId}";
+                    return new RedirectResponse($url);
+                }
+
+                return $app['twig']->render(
+                    'byEntityId.twig',
+                    [
+                        'entities' => $entities,
+                        'entityId' => $entityId,
+                        'reports' => [
+                            'only' => $reportsOnlyWithOnlyOneParameter,
+                            'rest' => $reportsWithOtherParameters,
+                        ]
+                    ]
+                );
             }
         );
     }

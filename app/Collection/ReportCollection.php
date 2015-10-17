@@ -29,54 +29,52 @@ class ReportCollection extends Collection
     public function findWithOnlyOneEntity(array $entities)
     {
         $result = [];
-        $this->walk(
-            function (Report $r) use ($entities, &$result) {
-                if ([] === $r->parameters) {
-                    return;
-                }
-                if (count($r->parameters) > 1) {
-                    return;
-                }
-                /** @var Parameter $parameter */
-                $parameter = current($r->parameters);
-                if (!in_array($parameter->idOfEntity, $entities, true)) {
-                    return;
-                }
-
-                $tmp = new SearchByEntityResult;
-                $tmp->report = $r;
-                $tmp->parameter = $parameter;
-
-                $result[] = $tmp;
+        /** @var Report $report */
+        foreach ($this as $report) {
+            if (!$report->parameters->count()) {
+                continue;
             }
-        );
+            if ($report->parameters->count() > 1) {
+                continue;
+            }
+            /** @var Parameter $parameter */
+            $parameter = $report->parameters->first();
+            if (!in_array($parameter->idOfEntity, $entities, true)) {
+                continue;
+            }
+
+            $tmp = new SearchByEntityResult;
+            $tmp->report = $report;
+            $tmp->parameter = $parameter;
+
+            $result[] = $tmp;
+        }
         return $result;
     }
 
     public function findWithEntityAndSomethingElse(array $entities)
     {
         $result = [];
-        $this->walk(
-            function (Report $r) use ($entities, &$result) {
-                if ([] === $r->parameters) {
-                    return;
-                }
-                if (count($r->parameters) < 2) {
-                    return;
-                }
-                /** @var Parameter $parameter */
-                foreach ($r->parameters as $parameter) {
-                    if (in_array($parameter->idOfEntity, $entities, true)) {
-                        $tmp = new SearchByEntityResult;
-                        $tmp->report = $r;
-                        $tmp->parameter = $parameter;
+        /** @var Report $report */
+        foreach ($this as $report) {
+            if (!$report->parameters->count()) {
+                continue;
+            }
+            if ($report->parameters->count() < 2) {
+                continue;
+            }
+            /** @var Parameter $parameter */
+            foreach ($report->parameters as $parameter) {
+                if (in_array($parameter->idOfEntity, $entities, true)) {
+                    $tmp = new SearchByEntityResult;
+                    $tmp->report = $report;
+                    $tmp->parameter = $parameter;
 
-                        $result[] = $tmp;
-                        return;
-                    }
+                    $result[] = $tmp;
+                    continue;
                 }
             }
-        );
+        }
         return $result;
     }
 }

@@ -3,6 +3,7 @@ namespace PODataHeaven\Service;
 
 use League\Flysystem\Filesystem;
 use PODataHeaven\Collection\Collection;
+use PODataHeaven\Container\ReportExecutionResult;
 use PODataHeaven\Exception\NoResultException;
 use PODataHeaven\Model\Column;
 use PODataHeaven\Model\Report;
@@ -35,6 +36,9 @@ class MappingService
         }
     }
 
+    /**
+     * @return Collection
+     */
     public function getMappings()
     {
         if (null === $this->mappings) {
@@ -43,30 +47,39 @@ class MappingService
         return $this->mappings;
     }
 
-    public function applyToReport(array $columns, Report $report)
+    /**
+     * @param Report $report
+     * @param ReportExecutionResult $result
+     */
+    public function generateResultColumns(Report $report, ReportExecutionResult $result)
     {
+        if (!$result->rows) {
+            return;
+        }
+
         $mappings = $this->getMappings();
 
-        foreach ($columns as $column) {
-            if (!$mappings->containsKey($column)) {
+        $columnsRaw = array_keys(reset($result->rows));
+        foreach ($columnsRaw as $columnName) {
+            //put column to result
+            try {
+                $column = $report->columns->findOneByName($columnName);
+            } catch (NoResultException $e) {
+                $column = new Column;
+                $column->name = $columnName;
+                $column->format = Column::FORMAT_RAW;
+            }
+            $result->columns->add($column);
+
+            //fill mapping
+            if (!$mappings->containsKey($columnName)) {
                 continue;
             }
 
-            try {
-                $columnModel = $report->columns->findByName($column);
-
-                foreach ($mappings->offsetGet($column) as $entity) {
-                    if (!in_array($entity, $columnModel->idOfEntities, true)) {
-                        $columnModel->idOfEntities[] = $entity;
-                    }
+            foreach ($mappings->get($columnName) as $entityName) {
+                if (!in_array($entityName, $column->idOfEntities, true)) {
+                    $column->idOfEntities[] = $entityName;
                 }
-            } catch (NoResultException $e) {
-                $columnModel = new Column();
-                $columnModel->name = $column;
-                $columnModel->format = Column::FORMAT_RAW;
-                $columnModel->idOfEntities = $mappings->offsetGet($column);
-
-                $report->columns->add($columnModel);
             }
         }
     }
