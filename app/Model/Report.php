@@ -1,6 +1,10 @@
 <?php
 namespace PODataHeaven\Model;
 
+use Arrayzy\MutableArray;
+use PODataHeaven\Collection\Collection;
+use PODataHeaven\Collection\ColumnCollection;
+
 class Report
 {
     const ORIENTATION_VERTICAL = 'vertical';
@@ -12,11 +16,17 @@ class Report
     /** @var int */
     public $limit;
 
-    /** @var Column[] */
+    /** @var ColumnCollection|Column[] */
     public $columns = [];
 
-    /** @var Parameter[] */
+    /** @var MutableArray|Parameter[] */
     public $parameters = [];
+
+    public function __construct()
+    {
+        $this->columns = new ColumnCollection();
+        $this->parameters = new Collection();
+    }
 
     /**
      * @return bool

@@ -4,6 +4,9 @@ namespace PODataHeaven\Collection;
 class ReportExecutionResult
 {
     /** @var array */
+    public $headers;
+
+    /** @var array */
     public $rows;
 
     /** @var string */

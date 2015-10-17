@@ -22,8 +22,9 @@ class PoDataHaven
     /**
      * @param string $dotEnvDir
      * @param string $reportsDir
+     * @param string $mappingsDir
      */
-    public function __construct($dotEnvDir, $reportsDir)
+    public function __construct($dotEnvDir, $reportsDir, $mappingsDir)
     {
         $dotenv = new Dotenv($dotEnvDir);
         $dotenv->load();

@@ -2,18 +2,19 @@
 namespace PODataHeaven\Collection;
 
 use Arrayzy\ImmutableArray;
+use Arrayzy\MutableArray;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
 
-class ReportCollection extends ImmutableArray
+class ReportCollection extends Collection
 {
     public function sortByNameAsc()
     {
-        return $this->customSort(
-            function (Report $a, Report $b) {
-                return strcmp($a->name, $b->name);
-            }
-        );
+//        return $this->customSort(
+//            function (Report $a, Report $b) {
+//                return strcmp($a->name, $b->name);
+//            }
+//        );
     }
 
     public function findOneByBaseName($baseName)

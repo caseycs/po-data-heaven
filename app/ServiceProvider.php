@@ -16,8 +16,18 @@ class ServiceProvider implements ServiceProviderInterface
             return $filesystem;
         };
 
+        $app['service.mappings_filesystem'] = function ($name) use ($app) {
+            $adapter = new Local(getenv('MAPPINGS_DIR'));
+            $filesystem = new Filesystem($adapter);
+            return $filesystem;
+        };
+
         $app['service.report'] = function ($name) use ($app) {
-            return new ReportService($app['service.reports_filesystem'], $app['db']);
+            return new ReportService(
+                $app['service.reports_filesystem'],
+                $app['service.mappings_filesystem'],
+                $app['db']
+            );
         };
 
         $app['reports'] = function ($name) use ($app) {

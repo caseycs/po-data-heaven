@@ -1,51 +1,43 @@
 <?php
-namespace PODataHeaven;
+namespace PODataHeaven\Service;
 
-use Doctrine\DBAL\Connection;
 use League\Flysystem\Filesystem;
 use PODataHeaven\Collection\ReportCollection;
-use PODataHeaven\Collection\ReportExecutionResult;
+use PODataHeaven\Container\ReportTreeNode;
 use PODataHeaven\Exception\LimitLessThenOneException;
 use PODataHeaven\Exception\NoKeyFoundException;
-use PODataHeaven\Exception\ReportParameterRequiredException;
 use PODataHeaven\Exception\ReportYmlInvalidException;
 use PODataHeaven\Model\Column;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Yaml\Yaml;
 
-class ReportService
+class ReportParserService
 {
-    /** @var Connection  */
-    private $connection;
+    /** @var ReportTreeNode */
+    private $reportsTreeRoot;
 
-    public function __construct(Filesystem $fs, Connection $connection)
+    public function __construct(Filesystem $reportsFs)
     {
-        $this->fs = $fs;
-        $this->connection = $connection;
-    }
+        $this->reports = new ReportCollection;
 
-    /**
-     * @return ReportCollection
-     * @throws ReportYmlInvalidException
-     */
-    public function all()
-    {
-        $tmp = [];
-
-        foreach ($this->fs->listContents() as $ymlFileMetadata) {
+        foreach ($reportsFs->listContents() as $ymlFileMetadata) {
             if (substr($ymlFileMetadata['path'], -4) !== '.yml') {
                 continue;
             }
 
-            $yml = $this->fs->read($ymlFileMetadata['path']);
+            $yml = $reportsFs->read($ymlFileMetadata['path']);
             $data = Yaml::parse($yml);
-            $tmp[] = $this->buildReport($ymlFileMetadata['path'], $data);
+            $this->reports->push($this->buildReport($ymlFileMetadata['path'], $data));
         }
+    }
 
-        $reports = ReportCollection::create($tmp);
-        return $reports;
+    /**
+     * @return ReportTreeNode
+     */
+    public function getReportsTree()
+    {
+        return $this->reportsTreeRoot;
     }
 
     /**
@@ -81,59 +73,24 @@ class ReportService
             $parameter = new Parameter();
             $parameter->placeholder = $placeholder;
             $parameter->name = $this->getRequiredValue($pData, 'name');
-            $parameter->input = $this->getValue($pData, 'input');
+            $parameter->input = $this->getValue($pData, 'input', Parameter::INPUT_RAW);
             $parameter->idOfEntity = $this->getValue($pData, 'idOfEntity');
             $parameter->default = $this->getValue($pData, 'default');
 
-            $report->parameters[] = $parameter;
+            $report->parameters->push($parameter);
         }
 
         foreach ($this->getValue($data, 'columns', []) as $name => $cData) {
             $column = new Column();
             $column->name = $name;
-            $column->format = $this->getValue($cData, 'format');
+            $column->format = $this->getValue($cData, 'format', Column::FORMAT_RAW);
             $column->chop = $this->getValue($cData, 'chop', null);
             $column->idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
 
-            $report->columns[$name] = $column;
+            $report->columns->offsetSet($name, $column);
         }
 
         return $report;
-    }
-
-    /**
-     * @param Report $report
-     * @param ParameterBag $paramsPassed
-     * @return ReportExecutionResult
-     * @throws ReportParameterRequiredException
-     */
-    public function execute(Report $report, ParameterBag $paramsPassed)
-    {
-        $params = [];
-        foreach ($report->parameters as $p) {
-            if (!$paramsPassed->has($p->placeholder)) {
-                throw new ReportParameterRequiredException($p->placeholder);
-            }
-            $params[$p->placeholder] = trim($paramsPassed->get($p->placeholder));
-        }
-
-        $sql = $report->sql;
-
-        $sql .= ' ORDER BY ' . $report->order;
-        $sql .= ' LIMIT ' . $report->limit;
-
-        $rows = $this->connection->fetchAll($sql, $params);
-
-        $result = new ReportExecutionResult();
-        $result->rows = $rows;
-        $result->sql = $sql;
-        $result->parameters = $params;
-
-        foreach ($params as $param => $value) {
-            $result->sql = str_replace(':' . $param, $this->connection->quote($value), $result->sql);
-        }
-
-        return $result;
     }
 
     private function getValue(array $data, $key, $default = null)
