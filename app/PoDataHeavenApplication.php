@@ -7,7 +7,7 @@ use PODataHeaven\ServiceProvider\EnvironmentProvider;
 use PODataHeaven\ServiceProvider\RoutesProvider;
 use Silex\Application;
 
-class PoDataHavenApplication extends Application
+class PoDataHeavenApplication extends Application
 {
     public function __construct()
     {

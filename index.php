@@ -1,11 +1,11 @@
 <?php
 use Dotenv\Dotenv;
-use PODataHeaven\PoDataHavenApplication;
+use PODataHeaven\PoDataHeavenApplication;
 
 require __DIR__ . '/vendor/autoload.php';
 
 $dotenv = new Dotenv(__DIR__);
 $dotenv->load();
 
-$app = new PoDataHavenApplication();
+$app = new PoDataHeavenApplication();
 $app->run();

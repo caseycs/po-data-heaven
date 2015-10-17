@@ -59,7 +59,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     protected function prepareMink()
     {
-        $app = new \PODataHeaven\PoDataHavenApplication;
+        $app = new \PODataHeaven\PoDataHeavenApplication;
         $app['debug'] = false;
 
         $session = new Session(new BrowserKitDriver(new Client($app)));
