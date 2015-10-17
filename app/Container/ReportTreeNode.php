@@ -3,6 +3,8 @@ namespace PODataHeaven\Container;
 
 use PODataHeaven\Collection\Collection;
 use PODataHeaven\Collection\ReportCollection;
+use PODataHeaven\Exception\NoResultException;
+use PODataHeaven\Model\Report;
 
 class ReportTreeNode
 {
@@ -16,5 +18,15 @@ class ReportTreeNode
     {
         $this->children = new Collection();
         $this->reports = new ReportCollection();
+    }
+
+    /**
+     * @param string $baseName
+     * @return Report
+     * @throws NoResultException
+     */
+    public function findReport($baseName)
+    {
+        return $this->reports->findOneByBaseName($baseName);
     }
 }

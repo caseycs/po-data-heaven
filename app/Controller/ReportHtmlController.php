@@ -1,7 +1,6 @@
 <?php
 namespace PODataHeaven\Controller;
 
-use PODataHeaven\Collection\ReportCollection;
 use PODataHeaven\Service\ReportExecutorService;
 use PODataHeaven\Service\ReportParserService;
 use Symfony\Component\HttpFoundation\Request;
@@ -9,14 +8,16 @@ use Twig_Environment;
 
 class ReportHtmlController
 {
+    use ReportSafeFinderTrait;
+
     /** @var Twig_Environment */
-    var $twig;
+    protected $twig;
 
     /** @var ReportParserService */
-    var $reportParserService;
+    protected $reportParserService;
 
     /** @var ReportExecutorService */
-    var $reportExecutorService;
+    protected $reportExecutorService;
 
     /**
      * ReportConfigController constructor.
@@ -36,9 +37,7 @@ class ReportHtmlController
 
     public function action($baseName, Request $request)
     {
-        /** @var ReportCollection $reports */
-        $reports = $this->reportParserService->getReportsTree()->reports;
-        $report = $reports->findOneByBaseName($baseName);
+        $report = $this->findReport($baseName);
 
         $reportExecutionResult = $this->reportExecutorService->execute($report, $request->query);
 

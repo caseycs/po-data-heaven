@@ -9,10 +9,10 @@ use Twig_Environment;
 class ReportByEntityController
 {
     /** @var Twig_Environment */
-    var $twig;
+    protected $twig;
 
     /** @var ReportParserService */
-    var $reportParserService;
+    protected $reportParserService;
 
     /**
      * ReportConfigController constructor.

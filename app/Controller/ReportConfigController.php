@@ -9,11 +9,13 @@ use Twig_Environment;
 
 class ReportConfigController
 {
+    use ReportSafeFinderTrait;
+
     /** @var Twig_Environment */
-    var $twig;
+    protected $twig;
 
     /** @var ReportParserService */
-    var $reportParserService;
+    protected $reportParserService;
 
     /**
      * IndexController constructor.
@@ -28,9 +30,7 @@ class ReportConfigController
 
     public function action($baseName, Request $request)
     {
-        /** @var ReportCollection $reports */
-        $reports = $this->reportParserService->getReportsTree()->reports;
-        $report = $reports->findOneByBaseName($baseName);
+        $report = $this->findReport($baseName);
 
         if (!$report->parameters->count()) {
             return new RedirectResponse("/report/{$baseName}/result");

@@ -7,10 +7,10 @@ use Twig_Environment;
 class IndexController
 {
     /** @var Twig_Environment */
-    var $twig;
+    protected $twig;
 
     /** @var ReportParserService */
-    var $reportParserService;
+    protected $reportParserService;
 
     /**
      * IndexController constructor.

@@ -8,6 +8,12 @@ use PODataHeaven\Exception\NonUniqueException;
 
 class Collection extends ArrayCollection
 {
+    /**
+     * @param Closure $filter
+     * @return mixed
+     * @throws NoResultException
+     * @throws NonUniqueException
+     */
     public function findOne(Closure $filter)
     {
         $found = $this->filter($filter);

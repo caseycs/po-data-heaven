@@ -61,7 +61,6 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         $app = new \PODataHeaven\PoDataHavenApplication;
         $app['debug'] = false;
-        unset($app['exception_handler']);
 
         $session = new Session(new BrowserKitDriver(new Client($app)));
 

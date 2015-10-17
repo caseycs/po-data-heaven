@@ -1,6 +1,7 @@
 <?php
 namespace PODataHeaven\Collection;
 
+use PODataHeaven\Exception\NoResultException;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
 
@@ -9,21 +10,20 @@ class ReportCollection extends Collection
 {
     public function sortByNameAsc()
     {
-//        return $this->customSort(
-//            function (Report $a, Report $b) {
-//                return strcmp($a->name, $b->name);
-//            }
-//        );
         return $this;
     }
 
+    /**
+     * @param string $baseName
+     * @return Report
+     * @throws NoResultException
+     */
     public function findOneByBaseName($baseName)
     {
-        return $this->filter(
-            function (Report $r) use ($baseName) {
-                return $r->baseName === $baseName;
-            }
-        )->first();
+        $closure = function (Report $r) use ($baseName) {
+            return $r->baseName === $baseName;
+        };
+        return $this->findOne($closure);
     }
 
     public function findWithOnlyOneEntity(array $entities)
