@@ -17,7 +17,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
     protected function prepareDatabase()
     {
-        $path = realpath(__DIR__ . '/../../test.sqlite');
+        $path = __DIR__ . '/../../test.sqlite';
 
         if (is_file($path)) {
             unlink($path);
