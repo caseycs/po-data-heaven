@@ -2,7 +2,9 @@
 namespace PODataHeaven\Service;
 
 use League\Flysystem\Filesystem;
+use PODataHeaven\CellFormatter\IdOfEntitiesFormatter;
 use PODataHeaven\Container\ReportTreeNode;
+use PODataHeaven\Exception\FormatterNotFoundException;
 use PODataHeaven\Exception\LimitLessThenOneException;
 use PODataHeaven\Exception\NoKeyFoundException;
 use PODataHeaven\Exception\PODataHeavenException;
@@ -114,9 +116,21 @@ class ReportParserService
         foreach ($this->getValue($data, 'columns', []) as $name => $cData) {
             $column = new Column();
             $column->name = $name;
-            $column->format = $this->getValue($cData, 'format', Column::FORMAT_RAW);
-            $column->chop = $this->getValue($cData, 'chop', null);
-            $column->idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
+
+            $idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
+            if ([] !== $idOfEntities) {
+                $column->formatter = new IdOfEntitiesFormatter(['idOfEntities' => $idOfEntities]);
+                $column->idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
+            } else {
+                $formatterOptionValue = $this->getValue($cData, 'format', 'raw');
+                $formatterClassName = '\\PODataHeaven\\CellFormatter\\' . $formatterOptionValue . 'Formatter';
+                if (!class_exists($formatterClassName)) {
+                    throw new FormatterNotFoundException($formatterOptionValue);
+                }
+
+                $column->formatter = new $formatterClassName();
+                $column->idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
+            }
 
             $report->columns->add($column);
         }

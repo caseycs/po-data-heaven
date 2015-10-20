@@ -1,17 +1,13 @@
 <?php
 namespace PODataHeaven\Model;
 
+use PODataHeaven\CellFormatter\FormatterInterface;
+
 class Column
 {
-    const FORMAT_RAW = 'raw';
-    const FORMAT_NUMBER = 'number';
-
     /** @var string */
-    public $name, $format = self::FORMAT_RAW;
+    public $name;
 
-    /** @var array */
-    public $idOfEntities = [];
-
-    /** @var string */
-    public $chop;
+    /** @var FormatterInterface */
+    public $formatter;
 }

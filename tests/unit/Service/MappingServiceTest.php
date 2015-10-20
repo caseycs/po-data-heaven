@@ -4,6 +4,8 @@ namespace PODataHeaven\Test\Service;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use PHPUnit_Framework_TestCase;
+use PODataHeaven\CellFormatter\IdOfEntitiesFormatter;
+use PODataHeaven\CellFormatter\RawFormatter;
 use PODataHeaven\Container\ReportExecutionResult;
 use PODataHeaven\Model\Column;
 use PODataHeaven\Model\Report;
@@ -74,6 +76,7 @@ class MappingServiceTest extends PHPUnit_Framework_TestCase
 
         $column = new Column;
         $column->name = 'user_id';
+        $column->formatter = new RawFormatter();
         $this->assertEquals($column, $reportResult->columns->first());
     }
 
@@ -90,7 +93,7 @@ class MappingServiceTest extends PHPUnit_Framework_TestCase
 
         $column = new Column;
         $column->name = 'user_id';
-        $column->idOfEntities = ['user'];
+        $column->formatter = new IdOfEntitiesFormatter(['idOfEntities' => ['user']]);
         $this->assertEquals($column, $reportResult->columns->first());
     }
 
@@ -100,7 +103,7 @@ class MappingServiceTest extends PHPUnit_Framework_TestCase
 
         $column = new Column();
         $column->name = 'user_id';
-        $column->idOfEntities = ['consumer'];
+        $column->formatter = new IdOfEntitiesFormatter(['idOfEntities' => ['consumer']]);
 
         $report = new Report();
         $report->columns->add($column);
@@ -113,7 +116,7 @@ class MappingServiceTest extends PHPUnit_Framework_TestCase
 
         $column = new Column;
         $column->name = 'user_id';
-        $column->idOfEntities = ['consumer', 'user'];
+        $column->formatter = new IdOfEntitiesFormatter(['idOfEntities' => ['consumer', 'user']]);
         $this->assertEquals($column, $reportResult->columns->first());
     }
 }
