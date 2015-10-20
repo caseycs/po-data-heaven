@@ -4,7 +4,7 @@ namespace PODataHeaven\Test\Service;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use PHPUnit_Framework_TestCase;
-use PODataHeaven\Model\Column;
+use PODataHeaven\CellFormatter\IdOfEntitiesFormatter;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
 use PODataHeaven\Service\ReportParserService;
@@ -161,7 +161,7 @@ columns:
   ic_session_id:
     idOfEntities: ic_session
   col2:
-    format: number
+    format: url
     idOfEntities: [a, b]
 ');
 
@@ -171,12 +171,10 @@ columns:
 
         $column = $report->columns->first();
         $this->assertSame('ic_session_id', $column->name);
-        $this->assertSame(['ic_session'], $column->idOfEntities);
-        $this->assertSame(Column::FORMAT_RAW, $column->format);
+        $this->assertEquals(new IdOfEntitiesFormatter(['idOfEntities' => ['ic_session']]), $column->formatter);
 
         $column = $report->columns->offsetGet(1);
         $this->assertSame('col2', $column->name);
-        $this->assertSame(['a', 'b'], $column->idOfEntities);
-        $this->assertSame(Column::FORMAT_NUMBER, $column->format);
+        $this->assertEquals(new IdOfEntitiesFormatter(['idOfEntities' => ['a', 'b']]), $column->formatter);
     }
 }

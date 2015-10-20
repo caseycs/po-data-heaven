@@ -33,15 +33,7 @@
             {% for row in result.rows %}
                 <tr>
                     {% for c in result.columns %}
-                        <td>
-                            {% if c.idOfEntities %}
-                                <a href="/by-entity/{{ c.idOfEntities|join(',') }}/{{ row[c.name] }}">{{ row[c.name] }}</a>
-                            {% elseif c.chop %}
-                                {{ row[c.name]|slice(0, c.chop) }}
-                            {% else %}
-                                {{ row[c.name] }}
-                            {% endif %}
-                        </td>
+                        <td>{{ c.formatter.format(row[c.name])|raw }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}

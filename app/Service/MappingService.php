@@ -2,6 +2,8 @@
 namespace PODataHeaven\Service;
 
 use League\Flysystem\Filesystem;
+use PODataHeaven\CellFormatter\IdOfEntitiesFormatter;
+use PODataHeaven\CellFormatter\RawFormatter;
 use PODataHeaven\Collection\Collection;
 use PODataHeaven\Container\ReportExecutionResult;
 use PODataHeaven\Exception\NoResultException;
@@ -67,20 +69,22 @@ class MappingService
             } catch (NoResultException $e) {
                 $column = new Column;
                 $column->name = $columnName;
-                $column->format = Column::FORMAT_RAW;
+                $column->formatter = new RawFormatter();
             }
-            $result->columns->add($column);
 
             //fill mapping
-            if (!$mappings->containsKey($columnName)) {
-                continue;
+            if ($mappings->containsKey($columnName)) {
+                if ($column->formatter instanceof IdOfEntitiesFormatter) {
+                    foreach ($mappings->get($columnName) as $entityName) {
+                        $column->formatter->ensureEntityPresented($entityName);
+                    }
+                } else {
+                    $column->formatter = new IdOfEntitiesFormatter(['idOfEntities' => $mappings->get($columnName)]);
+                }
+
             }
 
-            foreach ($mappings->get($columnName) as $entityName) {
-                if (!in_array($entityName, $column->idOfEntities, true)) {
-                    $column->idOfEntities[] = $entityName;
-                }
-            }
+            $result->columns->add($column);
         }
     }
 }
