@@ -1,6 +1,7 @@
 <?php
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
@@ -12,13 +13,13 @@ use Symfony\Component\HttpKernel\Client;
 class FeatureContext extends MinkContext implements Context, SnippetAcceptingContext
 {
     /** @var Filesystem */
-    private $testResourcesFs;
+    private $testFs;
+
+    /** @var PDO */
+    private $pdo;
 
     public function __construct()
     {
-        $adapter = new Local(__DIR__ . '/../../resources');
-        $this->testResourcesFs = new Filesystem($adapter);
-
         $this->prepareConfig();
         $this->prepareDatabase();
         $this->prepareMink();
@@ -29,10 +30,14 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         $pathRoot = realpath(__DIR__ . '/../../../');
         $pathSqlite = $pathRoot . '/test.sqlite';
 
+        $testsPath = realpath(__DIR__ . '/../../');
+        $adapter = new Local($testsPath);
+        $this->testFs = new Filesystem($adapter);
+
         putenv('DB_DRIVER=pdo_sqlite');
         putenv('DB_PATH=' . $pathSqlite);
-        putenv("REPORTS_DIR={$pathRoot}/tests/resources/reports");
-        putenv("MAPPINGS_DIR={$pathRoot}/tests/resources/mappings");
+        putenv("REPORTS_DIR={$testsPath}/tmp/reports");
+        putenv("MAPPINGS_DIR={$testsPath}/tmp/mappings");
     }
 
     protected function prepareDatabase()
@@ -43,18 +48,8 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
             unlink($pathSqlite);
         }
 
-        $pdo = new PDO('sqlite:' . $pathSqlite);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $pdo->exec('create table `messages` (`id` int, `user_id` int, `content` varchar(50))');
-        $pdo->exec('insert into `messages` VALUES (1, 1, "Hello buddy 1")');
-        $pdo->exec('insert into `messages` VALUES (2, 1, "Hello buddy 2")');
-        $pdo->exec('insert into `messages` VALUES (3, 2, "I like it 1")');
-        $pdo->exec('insert into `messages` VALUES (4, 2, "I like it 2")');
-
-        $pdo->exec('create table `users` (`id` int, `name` varchar(50))');
-        $pdo->exec('insert into `users` VALUES (1, "joe")');
-        $pdo->exec('insert into `users` VALUES (2, "alice")');
+        $this->pdo = new PDO('sqlite:' . $pathSqlite);
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
     protected function prepareMink()
@@ -69,35 +64,65 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         $this->setMink($mink);
     }
 
+
     /**
-     * @Given /^ensure YAML report with parse error presented$/
+     * @BeforeScenario
      */
-    public function ensureYAMLReportWithParseErrorPresented()
+    public function cleanupFsBeforeScenario(BeforeScenarioScope $scope)
     {
-        $this->testResourcesFs->copy('invalid.yml', 'reports/invalid.yml');
+        $this->testFs->deleteDir('tmp/reports');
+        $this->testFs->createDir('tmp/reports');
+        $this->testFs->deleteDir('tmp/mappings');
+        $this->testFs->createDir('tmp/mappings');
     }
 
     /**
-     * @Given /^ensure YAML report with parse error removed/
+     * @Given /^ensure report "(?P<report>[^"]+)" presented$/
      */
-    public function ensureYAMLReportWithParseErrorRemoved()
+    public function ensureReportPresented($report)
     {
-        $this->testResourcesFs->delete('reports/invalid.yml');
+        $this->testFs->copy('resources/reports/' . $report, 'tmp/reports/' . $report);
     }
 
     /**
-     * @Given /^ensure YAML report with logic error presented$/
+     * @Given /^ensure mapping "(?P<mapping>[^"]+)" presented$/
      */
-    public function ensureYAMLReportWithLogicErrorPresented()
+    public function ensureMappingPresented($mapping)
     {
-        $this->testResourcesFs->copy('report-with-logic-error.yml', 'reports/report-with-logic-error.yml');
+        $this->testFs->copy('resources/mappings/' . $mapping, 'tmp/mappings/' . $mapping);
     }
 
     /**
-     * @Given /^ensure YAML report with logic error removed/
+     * @Given /^messages table exists$/
      */
-    public function ensureYAMLReportWithLogicErrorRemoved()
+    public function messagesTableExists()
     {
-        $this->testResourcesFs->delete('reports/report-with-logic-error.yml');
+        $this->pdo->exec('create table `messages` (`id` int, `user_id` int, `content` varchar(50))');
+    }
+
+    /**
+     * @Given /^users table exists$/
+     */
+    public function usersTableExists()
+    {
+        $this->pdo->exec('create table `users` (`id` int, `name` varchar(50))');
+    }
+
+    /**
+     * @Given /^user stored with id "(?P<id>[^"]+)" and name "(?P<name>[^"]+)"$/
+     */
+    public function userStored($id, $name)
+    {
+        $statement = $this->pdo->prepare('insert into `users` VALUES (?, ?)');
+        $statement->execute([$id, $name]);
+    }
+
+    /**
+     * @Given /^message stored with user_id "(?P<userId>[^"]+)" and content "(?P<content>[^"]+)"$/
+     */
+    public function messageStored($userId, $content)
+    {
+        $statement = $this->pdo->prepare('insert into `messages` VALUES (?, ?, ?)');
+        $statement->execute([null, $userId, $content]);
     }
 }

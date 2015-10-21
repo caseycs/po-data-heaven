@@ -1,5 +1,10 @@
 Feature: Report pages contain edit button
 
+  Background:
+    Given ensure report "messages-of-user.yml" presented
+    And messages table exists
+    And message stored with user_id "2" and content "msg"
+
   Scenario: Report config page
     Given I am on the homepage
     Then I follow "Messages of user"
