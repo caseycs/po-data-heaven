@@ -10,8 +10,8 @@ class RoutesProvider implements ServiceProviderInterface
     {
         $app->get('/', "index.controller:action");
         $app->get('/report/{baseName}', "report_config.controller:action");
-        $app->get('/report/{baseName}/result', "report_html.controller:action");
-        $app->get('/report/{baseName}/csv', "report_csv.controller:action");
+        $app->match('/report/{baseName}/result', "report_html.controller:action")->method('GET|POST');
+        $app->match('/report/{baseName}/csv', "report_csv.controller:action")->method('GET|POST');
         $app->get('/by-entity/{entities}/{entityId}', "report_by_entity.controller:action");
     }
 
