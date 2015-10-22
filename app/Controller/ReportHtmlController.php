@@ -39,7 +39,8 @@ class ReportHtmlController
     {
         $report = $this->findReport($baseName);
 
-        $reportExecutionResult = $this->reportExecutorService->execute($report, $request->query);
+        $params = $request->isMethod('GET') ? $request->query : $request->request;
+        $reportExecutionResult = $this->reportExecutorService->execute($report, $params);
 
         $templateData = [
             'report' => $report,

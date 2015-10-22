@@ -7,6 +7,8 @@ $(function() {
         $('#' + placeholder + '-multiple').show();
         $('#' + placeholder + '-multiple-input').prop('disabled', false);
 
+        $('#report-config-form').prop('method', 'POST');
+
         return false;
     });
 
@@ -17,6 +19,8 @@ $(function() {
 
         $('#' + placeholder + '-multiple').hide();
         $('#' + placeholder + '-multiple-input').prop('disabled', true);
+
+        $('#report-config-form').prop('method', 'GET');
 
         return false;
     });
