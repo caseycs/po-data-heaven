@@ -15,7 +15,7 @@
     <h3>Parameters</h3>
     <p>
         {% for p in report.parameters %}
-            {{ p.name }}: {{ result.parameters[p.placeholder] }}<br/>
+            {{ p.name }}: {{ result.parameters[p.placeholder]|join(', ') }}<br/>
         {% endfor %}
     </p>
 

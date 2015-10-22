@@ -20,11 +20,26 @@
     <form class="form-horizontal" action="/report/{{ report.baseName }}/result" method="GET">
         {% for p in report.parameters %}
             <div class="form-group">
-                <label for="{{ p.placeholder }}" class="col-sm-2 control-label">{{ p.name }}</label>
+                <label for="{{ p.placeholder }}-single" class="col-sm-2 control-label">{{ p.name }}</label>
 
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="{{ p.placeholder }}" placeholder="{{ p.default }}"
-                           name="{{ p.placeholder }}" value="{{ parameters.get(p.placeholder,p.default) }}">
+                    <span id="{{ p.placeholder }}-single">
+                        <input type="text" class="form-control" id="{{ p.placeholder }}-single-input" placeholder="{{ p.default }}"
+                               name="{{ p.placeholder }}" value="{{ parameters.get(p.placeholder,p.default) }}">
+                            <div class="text-right">
+                                <a href="#" class="show-multiple-input" data-placeholder="{{ p.placeholder }}">
+                                    multiple values per line
+                                </a>
+                            </div>
+                    </span>
+                    <span id="{{ p.placeholder }}-multiple" style="display:none">
+                        <textarea name="{{ p.placeholder }}-m" class="form-control" id="{{ p.placeholder }}-multiple-input" disabled="disabled" rows="3">{{ parameters.get(p.placeholder,p.default) }}</textarea>
+                            <div class="text-right">
+                                <a href="#" class="show-single-input" data-placeholder="{{ p.placeholder }}">
+                                    single value
+                                </a>
+                            </div>
+                    </span>
                 </div>
             </div>
         {% endfor %}

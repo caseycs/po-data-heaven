@@ -1,4 +1,9 @@
 <?php
+//for built-in php server
+if (is_file(__DIR__ . '/public' . $_SERVER['REQUEST_URI'])) {
+    return false;
+}
+
 use Dotenv\Dotenv;
 use PODataHeaven\PoDataHeavenApplication;
 

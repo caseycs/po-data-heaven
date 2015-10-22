@@ -16,7 +16,8 @@
         "symfony/twig-bridge": "~2.7",
         "doctrine/dbal": "~2.5",
         "goodby/csv": "~1.2",
-        "jdorn/sql-formatter": "~1.2"
+        "jdorn/sql-formatter": "~1.2",
+        "monolog/monolog": "~1.17"
     },
     "autoload": {
         "psr-4": {

@@ -3,6 +3,7 @@ namespace PODataHeaven\ServiceProvider;
 
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
+use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\ServiceProviderInterface;
@@ -27,6 +28,10 @@ class EnvironmentProvider implements ServiceProviderInterface
             ],
         ];
         $app->register(new DoctrineServiceProvider(), $dbParams);
+
+        $app->register(new MonologServiceProvider(), array(
+            'monolog.logfile' => getenv('LOG_DIR') . '/application.log',
+        ));
     }
 
     public function boot(Application $app)

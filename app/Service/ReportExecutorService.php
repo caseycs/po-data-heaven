@@ -2,6 +2,7 @@
 namespace PODataHeaven\Service;
 
 use Doctrine\DBAL\Connection;
+use PDO;
 use PODataHeaven\Container\ReportExecutionResult;
 use PODataHeaven\Exception\ReportParameterRequiredException;
 use PODataHeaven\Model\Report;
@@ -30,16 +31,25 @@ class ReportExecutorService
     public function execute(Report $report, ParameterBag $paramsPassed)
     {
         $params = [];
+        $paramsTypes = [];
         foreach ($report->parameters as $p) {
-            if (!$paramsPassed->has($p->placeholder)) {
+            if ($paramsPassed->has($p->placeholder)) {
+                $params[$p->placeholder] = trim($paramsPassed->get($p->placeholder));
+                $paramsTypes[$p->placeholder] = PDO::PARAM_INT;
+            } elseif ($paramsPassed->has($p->placeholder. '-m')) {
+                $values = explode("\n", $paramsPassed->get($p->placeholder . '-m'));
+                $values = array_map('trim', $values);
+                $values = array_filter($values);
+                $params[$p->placeholder] = $values;
+                $paramsTypes[$p->placeholder] = Connection::PARAM_INT_ARRAY;
+            } else {
                 throw new ReportParameterRequiredException($p->placeholder);
             }
-            $params[$p->placeholder] = trim($paramsPassed->get($p->placeholder));
         }
 
         $sql = $this->buildSql($report);
 
-        $rows = $this->connection->fetchAll($sql, $params);
+        $rows = $this->connection->fetchAll($sql, $params, $paramsTypes);
 
         $result = new ReportExecutionResult();
         $result->rows = $rows;
@@ -60,7 +70,14 @@ class ReportExecutorService
     {
         $sqlGenerated = $sql;
         foreach ($params as $param => $value) {
-            $sqlGenerated = str_replace(':' . $param, $this->connection->quote($value), $sqlGenerated);
+            if (is_array($value)) {
+                $connection = $this->connection;
+                $quotedArray = array_map(function ($v) use ($connection) {return $connection->quote($v);}, $value);
+                $valueQuoted = join(',', $quotedArray);
+            } else {
+                $valueQuoted = $this->connection->quote($value);
+            }
+            $sqlGenerated = str_replace(':' . $param, $valueQuoted, $sqlGenerated);
         }
         return $sqlGenerated;
     }
