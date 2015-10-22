@@ -36,7 +36,7 @@ name: Consumer details
 description: bla bla bla
 
 sql: >
- SELECT * FROM `user` WHERE company_id = :id AND type = :type
+ SELECT * FROM `user` WHERE company_id = :company_id AND type = :type
 
 parameters:
   company_id:
