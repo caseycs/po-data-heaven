@@ -36,7 +36,8 @@ name: Consumer details
 description: bla bla bla
 
 sql: >
- SELECT * FROM `user` WHERE company_id = :company_id AND type = :type
+ SELECT * FROM `user`
+ WHERE company_id = :company_id AND type = :type
 
 parameters:
   company_id:
@@ -44,6 +45,10 @@ parameters:
     idOfEntity: company
   type:
     name: user type
+
+order: name ASC
+
+limit: 100
 
 columns:
   created_at:
