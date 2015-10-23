@@ -9,6 +9,7 @@ use PODataHeaven\Exception\LimitLessThenOneException;
 use PODataHeaven\Exception\NoKeyFoundException;
 use PODataHeaven\Exception\PODataHeavenException;
 use PODataHeaven\Exception\ReportYmlInvalidException;
+use PODataHeaven\Exception\TransformerNotFoundException;
 use PODataHeaven\Model\Column;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
@@ -133,6 +134,20 @@ class ReportParserService
             }
 
             $report->columns->add($column);
+        }
+
+        foreach ($this->getValue($data, 'transformers', []) as $name => $tData) {
+            $transformerClassName = '\\PODataHeaven\\ReportTransformer\\' . ucfirst($name) . 'Transformer';
+            if (!class_exists($transformerClassName)) {
+                throw new TransformerNotFoundException($name);
+            }
+
+            if (null === $tData) {
+                $tData = [];
+            }
+
+            $transformer = new $transformerClassName($tData);
+            $report->transformers->add($transformer);
         }
 
         return $report;

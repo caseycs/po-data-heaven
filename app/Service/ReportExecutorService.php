@@ -6,6 +6,7 @@ use PDO;
 use PODataHeaven\Container\ReportExecutionResult;
 use PODataHeaven\Exception\ReportParameterRequiredException;
 use PODataHeaven\Model\Report;
+use PODataHeaven\ReportTransformer\TransformerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ReportExecutorService
@@ -51,6 +52,8 @@ class ReportExecutorService
 
         $rows = $this->connection->fetchAll($sql, $params, $paramsTypes);
 
+        $rows = $this->transformRows($report, $rows);
+
         $result = new ReportExecutionResult();
         $result->rows = $rows;
         $result->parameters = $params;
@@ -59,6 +62,15 @@ class ReportExecutorService
         $this->mappingService->generateResultColumns($report, $result);
 
         return $result;
+    }
+
+    protected function transformRows(Report $report, array $rows)
+    {
+        /** @var TransformerInterface $transformer */
+        foreach ($report->transformers as $transformer) {
+            $rows = $transformer->transform($rows);
+        }
+        return $rows;
     }
 
     /**

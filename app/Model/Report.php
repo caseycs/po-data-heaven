@@ -3,6 +3,7 @@ namespace PODataHeaven\Model;
 
 use PODataHeaven\Collection\ColumnCollection;
 use PODataHeaven\Collection\ParameterCollection;
+use PODataHeaven\Collection\TransformerCollection;
 
 class Report
 {
@@ -21,10 +22,14 @@ class Report
     /** @var ParameterCollection[] */
     public $parameters = [];
 
+    /** @var TransformerCollection[] */
+    public $transformers = [];
+
     public function __construct()
     {
         $this->columns = new ColumnCollection();
         $this->parameters = new ParameterCollection();
+        $this->transformers = new TransformerCollection();
     }
 
     /**
