@@ -61,7 +61,6 @@ order: id ASC');
     public function test_getReportsTree_defaultMapping()
     {
         $this->filesystem->put('first-report.yml', 'name: test1
-description: bla bla bla
 sql: >
  SELECT * FROM `address` WHERE id = :id');
 
@@ -70,7 +69,7 @@ sql: >
 
         $this->assertSame('test1', $report->name);
         $this->assertSame('first-report', $report->baseName);
-        $this->assertSame('bla bla bla', $report->description);
+        $this->assertSame(null, $report->description);
         $this->assertSame(Report::ORIENTATION_VERTICAL, $report->orientation);
         $this->assertSame(null, $report->order);
         $this->assertSame(null, $report->limit);
@@ -119,7 +118,6 @@ sql: >
 
 parameters:
   p1:
-    name: p1 title
   p2:
     name: p2 title
     input: raw
@@ -136,7 +134,7 @@ order: id ASC
 
         $parameter = $report->parameters->first();
         $this->assertSame('p1', $parameter->placeholder);
-        $this->assertSame('p1 title', $parameter->name);
+        $this->assertSame('p1', $parameter->name);
         $this->assertSame(Parameter::INPUT_RAW, $parameter->input);
 
         $parameter = $report->parameters->offsetGet(1);

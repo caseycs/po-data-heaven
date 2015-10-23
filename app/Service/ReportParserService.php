@@ -78,7 +78,7 @@ class ReportParserService
             $report->filename = $path;
             $report->baseName = substr($path, 0, -4);
             $report->name = $this->getRequiredValue($data, 'name');
-            $report->description = $this->getRequiredValue($data, 'description');
+            $report->description = $this->getValue($data, 'description');
             $report->sql = $this->getRequiredValue($data, 'sql');
 
             if ($this->hasValue($data, 'limit')) {
@@ -105,7 +105,7 @@ class ReportParserService
 
             $parameter = new Parameter();
             $parameter->placeholder = $placeholder;
-            $parameter->name = $this->getRequiredValue($pData, 'name');
+            $parameter->name = $this->getValue($pData, 'name', $parameter->placeholder);
             $parameter->input = $this->getValue($pData, 'input', Parameter::INPUT_RAW);
             $parameter->idOfEntity = $this->getValue($pData, 'idOfEntity');
             $parameter->default = $this->getValue($pData, 'default');

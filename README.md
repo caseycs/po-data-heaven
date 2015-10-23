@@ -17,14 +17,11 @@ A simplest one:
 ```
 name: Consumer details
 
-description: bla bla bla
-
 sql: >
  SELECT * FROM `user` WHERE id IN (:id)
 
 parameters:
   id:
-    name: user_id
 ```
 
 A complicated one:
