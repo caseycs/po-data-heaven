@@ -3,7 +3,6 @@ namespace PODataHeaven\Controller;
 
 use Goodby\CSV\Export\Standard\Exporter;
 use Goodby\CSV\Export\Standard\ExporterConfig;
-use PODataHeaven\Collection\ReportCollection;
 use PODataHeaven\Service\ReportExecutorService;
 use PODataHeaven\Service\ReportParserService;
 use Symfony\Component\HttpFoundation\Request;

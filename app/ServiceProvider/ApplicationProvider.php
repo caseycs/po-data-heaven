@@ -3,9 +3,11 @@ namespace PODataHeaven\ServiceProvider;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use PODataHeaven\Service\DbStructureGeneratorService;
 use PODataHeaven\Service\MappingService;
 use PODataHeaven\Service\ReportExecutorService;
 use PODataHeaven\Service\ReportParserService;
+use PODataHeaven\Service\ReportResultStorageService;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use SqlFormatter;
@@ -45,6 +47,14 @@ class ApplicationProvider implements ServiceProviderInterface
 
         $app['report_executor.service'] = function () use ($app) {
             return new ReportExecutorService($app['db'], $app['mapping.service']);
+        };
+
+        $app['db_structure_generator.service'] = function () use ($app) {
+            return new DbStructureGeneratorService();
+        };
+
+        $app['report_result_storage.service'] = function () use ($app) {
+            return new ReportResultStorageService($app['dbs']['reports'], $app['db_structure_generator.service']);
         };
     }
 

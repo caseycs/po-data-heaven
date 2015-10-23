@@ -6,6 +6,7 @@ use PODataHeaven\Controller\ReportByEntityController;
 use PODataHeaven\Controller\ReportConfigController;
 use PODataHeaven\Controller\ReportCsvController;
 use PODataHeaven\Controller\ReportHtmlController;
+use PODataHeaven\Controller\TmpController;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
@@ -27,6 +28,9 @@ class ControllerProvider implements ServiceProviderInterface
         });
         $app['report_by_entity.controller'] = $app->share(function() use ($app) {
             return new ReportByEntityController($app['twig'], $app['report_parser.service']);
+        });
+        $app['tmp.controller'] = $app->share(function() use ($app) {
+            return new TmpController($app['report_result_storage.service']);
         });
     }
 
