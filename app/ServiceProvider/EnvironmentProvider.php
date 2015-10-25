@@ -14,6 +14,7 @@ class EnvironmentProvider implements ServiceProviderInterface
     {
         $app->register(new ServiceControllerServiceProvider());
         $app->register(new TwigServiceProvider,['twig.path' => __DIR__ . '/../../twig']);
+//        ddd(getenv('DB_PORT'));
 
         $dbParams = [
             'db.options' => [
@@ -27,6 +28,7 @@ class EnvironmentProvider implements ServiceProviderInterface
                 'charset' => 'utf8mb4',
             ],
         ];
+//        ddd($dbParams);
         $app->register(new DoctrineServiceProvider(), $dbParams);
 
         $app->register(new MonologServiceProvider(), array(

@@ -20,16 +20,22 @@ class GoogleGeoChartCityDashboardView extends DashboardViewAbstract implements D
 
         $columnsColumn = $reportResultColumnsCount > 2 ? 3 : 2;
 
+        $columnsColumn = 4;
+
+        $chartData = [];
         $chartData = [array_slice(array_keys(reset($reportExecutionResult->rows)), 0, $columnsColumn)];
-        $chartData[0][0] = 'City';
+//        $chartData[0][0] = 'City';
 
         foreach ($reportExecutionResult->rows as $row) {
-            if ($columnsColumn === 2) {
-                $chartData[] = [array_shift($row), (float)array_shift($row)];
-            } else {
-                $chartData[] = [array_shift($row), (float)array_shift($row), (float)array_shift($row)];
-            }
+            $chartData[] = [(float)array_shift($row), (float)array_shift($row), (float)array_shift($row), (float)array_shift($row)];
+//            if ($columnsColumn === 2) {
+//                $chartData[] = [array_shift($row), (float)array_shift($row)];
+//            } else {
+//                $chartData[] = [array_shift($row), (float)array_shift($row), (float)array_shift($row)];
+//            }
         }
+
+//        ddd($chartData);
 
         return [
             'rowsWithHeader' => $chartData,
