@@ -13,6 +13,7 @@ class RoutesProvider implements ServiceProviderInterface
         $app->match('/report/{baseName}/result', "report_html.controller:action")->method('GET|POST');
         $app->match('/report/{baseName}/csv', "report_csv.controller:action")->method('GET|POST');
         $app->get('/by-entity/{entities}/{entityId}', "report_by_entity.controller:action");
+        $app->get('/dashboard/{baseName}', "dashboard.controller:action");
     }
 
     public function boot(Application $app)

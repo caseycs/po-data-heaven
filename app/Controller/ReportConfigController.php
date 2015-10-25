@@ -1,7 +1,6 @@
 <?php
 namespace PODataHeaven\Controller;
 
-use PODataHeaven\Collection\ReportCollection;
 use PODataHeaven\Service\ReportParserService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

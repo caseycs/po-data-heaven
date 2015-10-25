@@ -5,14 +5,14 @@ use PODataHeaven\Exception\IdOfEntitiesNotSpecifiedException;
 
 class IdOfEntitiesFormatter extends AbstractFormatter
 {
-    public function __construct(array $options = [])
+    public function __construct(array $parameters = [])
     {
         parent::__construct();
 
-        if (!isset($options['idOfEntities']) || !is_array($options['idOfEntities']) || [] === $options['idOfEntities']) {
+        if (!isset($parameters['idOfEntities']) || !is_array($parameters['idOfEntities']) || [] === $parameters['idOfEntities']) {
             throw new IdOfEntitiesNotSpecifiedException;
         }
-        $this->idOfEntities = $options['idOfEntities'];
+        $this->idOfEntities = $parameters['idOfEntities'];
         $this->sort();
     }
 

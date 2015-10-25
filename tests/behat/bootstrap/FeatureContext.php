@@ -38,6 +38,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         putenv('DB_PATH=' . $pathSqlite);
         putenv("REPORTS_DIR={$testsPath}/tmp/reports");
         putenv("MAPPINGS_DIR={$testsPath}/tmp/mappings");
+        putenv("DASHBOARDS_DIR={$testsPath}/tmp/dashboards");
         putenv("LOG_DIR={$testsPath}/tmp/log");
     }
 
@@ -65,7 +66,6 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         $this->setMink($mink);
     }
 
-
     /**
      * @BeforeScenario
      */
@@ -79,6 +79,9 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
 
         $this->testFs->deleteDir('tmp/log');
         $this->testFs->createDir('tmp/log');
+
+        $this->testFs->deleteDir('tmp/dashboards');
+        $this->testFs->createDir('tmp/dashboards');
     }
 
     /**

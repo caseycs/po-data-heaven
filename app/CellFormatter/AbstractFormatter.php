@@ -1,23 +1,12 @@
 <?php
 namespace PODataHeaven\CellFormatter;
 
+use PODataHeaven\AbstractParameterContainer;
 use utilphp\util;
 
-abstract class AbstractFormatter implements FormatterInterface
+abstract class AbstractFormatter extends AbstractParameterContainer implements FormatterInterface
 {
-    protected $options;
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
-    }
-
     abstract public function format($value, array $row = []);
-
-    final protected function getOption($key, $default)
-    {
-        return isset($this->options[$key]) ? $this->options[$key] : $default;
-    }
 
     final protected function escape($value)
     {

@@ -4,7 +4,7 @@ namespace PODataHeaven\Service;
 use Doctrine\DBAL\Connection;
 use PDO;
 use PODataHeaven\Container\ReportExecutionResult;
-use PODataHeaven\Exception\ReportParameterRequiredException;
+use PODataHeaven\Exception\ParameterMissingException;
 use PODataHeaven\Model\Report;
 use PODataHeaven\ReportTransformer\TransformerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -27,7 +27,7 @@ class ReportExecutorService
      * @param Report $report
      * @param ParameterBag $paramsPassed
      * @return ReportExecutionResult
-     * @throws ReportParameterRequiredException
+     * @throws ParameterMissingException
      */
     public function execute(Report $report, ParameterBag $paramsPassed)
     {
@@ -44,7 +44,7 @@ class ReportExecutorService
                 $params[$p->placeholder] = $values;
                 $paramsTypes[$p->placeholder] = Connection::PARAM_INT_ARRAY;
             } else {
-                throw new ReportParameterRequiredException($p->placeholder);
+                throw new ParameterMissingException($p->placeholder);
             }
         }
 

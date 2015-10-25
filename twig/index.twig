@@ -22,4 +22,13 @@
 
     </ul>
 
+    <h2>All dashboards</h2>
+
+    <ul>
+        {% for d in dashboards %}
+            <li><a href="/dashboard/{{ d.baseName }}">{{ d.name }}</a></li>
+        {% endfor %}
+
+    </ul>
+
 {% endblock %}

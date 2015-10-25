@@ -8,7 +8,7 @@ class MysqlDateFormatter extends AbstractFormatter
         return sprintf(
             '<span title="%s">%s</span>',
             $value,
-            date($this->getOption('format', 'd.m.y H:i'), strtotime($value))
+            date($this->getParameter('format', 'd.m.y H:i'), strtotime($value))
         );
     }
 }

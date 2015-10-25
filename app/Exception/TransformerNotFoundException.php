@@ -1,13 +1,12 @@
 <?php
 namespace PODataHeaven\Exception;
 
+use Exception;
+
 class TransformerNotFoundException extends PODataHeavenException
 {
-    public $transformerName;
-
-    public function __construct($transformerName)
+    public function __construct($transformerName, Exception $prev = null)
     {
-        parent::__construct('Report transformer not found: ' . $transformerName);
-        $this->transformerName = $transformerName;
+        parent::__construct(sprintf('Report transformer %s not found', $transformerName), 0, $prev);
     }
 }
