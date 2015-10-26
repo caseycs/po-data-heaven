@@ -60,7 +60,7 @@ columns:
     format: truncate
     
 transformers:
-  - firstColumnRotate:
+  - firstColumnRotate: #will not work for this report
   - addTwigColumn:
       after: id
       name: nameAndAge
