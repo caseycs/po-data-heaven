@@ -1,47 +1,22 @@
 <?php
 namespace PODataHeaven\Test\ReportTransformer;
 
-use PODataHeaven\ReportTransformer\SumColumnsTransformer;
+use PODataHeaven\ReportTransformer\DivisionColumnsTransformer;
 
-class SumColumnsTransformerTest extends \PHPUnit_Framework_TestCase
+class DivisionColumnsTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    public function test_1column()
+    public function testSuccess()
     {
-        $params = ['source' => ['count'], 'result' => 'total'];
-        $transformer = new SumColumnsTransformer($params);
+        $params = ['dividend' => 'a', 'divisor' => 'b', 'result' => 'c'];
+        $transformer = new DivisionColumnsTransformer($params);
         $input = [
-            ['count' => '10'],
-            ['count' => '20'],
-            ['count' => '30'],
+            ['a' => '30', 'b' => '15'],
         ];
 
         $result = $transformer->transform($input);
 
         $expected = [
-            ['count' => '10', 'total' => '10'],
-            ['count' => '20', 'total' => '20'],
-            ['count' => '30', 'total' => '30'],
-        ];
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public function test_2columns()
-    {
-        $params = ['source' => ['count', 'c'], 'result' => 'total'];
-        $transformer = new SumColumnsTransformer($params);
-        $input = [
-            ['count' => '10', 'c' => 1],
-            ['count' => '20', 'c' => 1],
-            ['count' => '30', 'c' => 1],
-        ];
-
-        $result = $transformer->transform($input);
-
-        $expected = [
-            ['count' => '10', 'c' => 1, 'total' => '11'],
-            ['count' => '20', 'c' => 1, 'total' => '21'],
-            ['count' => '30', 'c' => 1, 'total' => '31'],
+            ['a' => '30', 'b' => '15', 'c' => 2],
         ];
 
         $this->assertEquals($expected, $result);
