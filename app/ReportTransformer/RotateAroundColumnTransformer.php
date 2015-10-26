@@ -9,12 +9,12 @@ class RotateAroundColumnTransformer extends AbstractParameterContainer implement
 {
     public function transform(array $rows)
     {
-        $pivotColumn = $this->getRequiredParameter('pivotColumn');
-        $countColumn = $this->getRequiredParameter('valueColumn');
+        $pivotColumn = $this->getRequiredParameter('pivot');
+        $countColumn = $this->getRequiredParameter('value');
 
-        $combineColumns = $this->getRequiredParameter('combineColumns');
+        $combineColumns = $this->getRequiredParameter('combine');
         if (!is_array($combineColumns)) {
-            throw new ParameterMissingException('combineColumns');
+            throw new ParameterMissingException('combine');
         }
 
         list($rowsPreProcessed, $allColumnCombinations) = $this->preProcess($rows, $pivotColumn, $combineColumns, $countColumn);

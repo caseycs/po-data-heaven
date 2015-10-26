@@ -7,7 +7,7 @@ class RotateAroundColumnTransformerTest extends \PHPUnit_Framework_TestCase
 {
     public function test_combine1column()
     {
-        $params = ['pivotColumn' => 'city', 'combineColumns' => ['parameter'], 'valueColumn' => 'count'];
+        $params = ['pivot' => 'city', 'combine' => ['parameter'], 'value' => 'count'];
         $transformer = new RotateAroundColumnTransformer($params);
 
         $input = [
@@ -31,7 +31,7 @@ class RotateAroundColumnTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function test_noPivotColumnPresented()
     {
-        $params = ['pivotColumn' => 'city1', 'combineColumns' => ['parameter'], 'valueColumn' => 'count'];
+        $params = ['pivot' => 'city1', 'combine' => ['parameter'], 'value' => 'count'];
         $transformer = new RotateAroundColumnTransformer($params);
 
         $input = [
@@ -43,7 +43,7 @@ class RotateAroundColumnTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function test_combine2columns()
     {
-        $params = ['pivotColumn' => 'city', 'combineColumns' => ['parameter1', 'parameter2'], 'valueColumn' => 'count'];
+        $params = ['pivot' => 'city', 'combine' => ['parameter1', 'parameter2'], 'value' => 'count'];
         $transformer = new RotateAroundColumnTransformer($params);
 
         $input = [
@@ -64,7 +64,7 @@ class RotateAroundColumnTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function test_combine2columns2extraColumns()
     {
-        $params = ['pivotColumn' => 'city', 'combineColumns' => ['parameter1', 'parameter2'], 'valueColumn' => 'count'];
+        $params = ['pivot' => 'city', 'combine' => ['parameter1', 'parameter2'], 'value' => 'count'];
         $transformer = new RotateAroundColumnTransformer($params);
 
         $input = [
