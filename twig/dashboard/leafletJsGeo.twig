@@ -6,12 +6,12 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="http://leafletjs.com/dist/leaflet.css"/>
+    <link rel="stylesheet" href="/leaflet.css"/>
 </head>
 <body>
 <div id="map" style="width: 900px; height: 600px"></div>
 
-<script src="http://leafletjs.com/dist/leaflet.js"></script>
+<script src="/leaflet.js"></script>
 <script>
     var data = {{ rows|json_encode|raw }};
     var params = {{ params|json_encode|raw }};
