@@ -27,8 +27,8 @@ class LeafletJsGeoDashboardView extends DashboardViewAbstract implements Dashboa
             if ($rowSource[$colorKey] > $maxColor) {
                 $maxColor = $rowSource[$colorKey];
             }
-            if ($rowSource[$sizeKey] > $maxSize) {
-                $maxSize = $rowSource[$sizeKey];
+            if (log10($rowSource[$sizeKey]) > $maxSize) {
+                $maxSize = log10($rowSource[$sizeKey]);
             }
         }
 
@@ -41,7 +41,7 @@ class LeafletJsGeoDashboardView extends DashboardViewAbstract implements Dashboa
                 'lat' => $rowSource[$latKey],
                 'lon' => $rowSource[$lonKey],
                 'sizeRaw' => $rowSource[$sizeKey],
-                'size' => $rowSource[$sizeKey] / $maxSize,
+                'size' => log10($rowSource[$sizeKey] / $maxSize),
                 'colorRaw' => $rowSource[$colorKey],
                 'color' => $this->getHexColorBetweenGreenAndRed($rowSource[$colorKey] / $maxColor),
                 'title' => $rowSource[$titleKey],

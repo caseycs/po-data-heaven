@@ -33,7 +33,7 @@
     for (var a in data) {
         var r = data[a];
 
-        L.circle([r.lat, r.lon], r.size * 6000 < 500 ? 500 : r.size * 6000, {
+        L.circle([r.lat, r.lon], r.size * params.radiusMax < params.radiusMin ? params.radiusMin : r.size * params.radiusMax, {
             color: r.color,
             fillColor: r.color,
             fillOpacity: 0.5
