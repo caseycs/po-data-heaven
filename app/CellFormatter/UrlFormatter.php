@@ -10,7 +10,7 @@ class UrlFormatter extends AbstractFormatter
         return sprintf(
             '<a href="%s" target="_blank">%s</a>',
             $value,
-            $this->escape(util::limit_characters($value, $this->getOption('limit', 20)))
+            $this->escape(util::limit_characters($value, $this->getParameter('limit', 20)))
         );
     }
 }

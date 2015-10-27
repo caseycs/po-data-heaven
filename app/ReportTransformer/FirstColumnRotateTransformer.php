@@ -1,9 +1,10 @@
 <?php
 namespace PODataHeaven\ReportTransformer;
 
-use RuntimeException;
+use PODataHeaven\Exception\NotEnoughColumnsException;
+use PODataHeaven\AbstractParameterContainer;
 
-class FirstColumnRotateTransformer extends AbstractTransformer
+class FirstColumnRotateTransformer extends AbstractParameterContainer implements TransformerInterface
 {
     public function transform(array $rows)
     {
@@ -33,7 +34,7 @@ class FirstColumnRotateTransformer extends AbstractTransformer
         $result = $allColumnCombinations = [];
         foreach ($rows as $row) {
             if (count($row) < 3) {
-                throw new RuntimeException;
+                throw new NotEnoughColumnsException(3);
             }
 
             $key = array_shift($row);

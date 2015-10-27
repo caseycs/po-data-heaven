@@ -13,7 +13,7 @@ class EnvironmentProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $app->register(new ServiceControllerServiceProvider());
-        $app->register(new TwigServiceProvider, ['twig.path' => __DIR__ . '/../../twig']);
+        $app->register(new TwigServiceProvider,['twig.path' => __DIR__ . '/../../twig']);
 
         $dbParams = [
             'dbs.options' => [

@@ -4,19 +4,25 @@ namespace PODataHeaven\Service;
 use League\Flysystem\Filesystem;
 use PODataHeaven\CellFormatter\IdOfEntitiesFormatter;
 use PODataHeaven\Container\ReportTreeNode;
+use PODataHeaven\Exception\ClassNotFoundException;
 use PODataHeaven\Exception\FormatterNotFoundException;
 use PODataHeaven\Exception\LimitLessThenOneException;
 use PODataHeaven\Exception\NoKeyFoundException;
 use PODataHeaven\Exception\PODataHeavenException;
-use PODataHeaven\Exception\ReportYmlInvalidException;
+use PODataHeaven\Exception\ReportInvalidException;
+use PODataHeaven\Exception\TransformerNotFoundException;
+use PODataHeaven\GetParameterFromArrayKeyTrait;
 use PODataHeaven\Model\Column;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
+use PODataHeaven\ObjectCreatorTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 class ReportParserService
 {
+    use GetParameterFromArrayKeyTrait, ObjectCreatorTrait;
+
     /** @var ReportTreeNode */
     private $reportsTreeRoot;
 
@@ -33,17 +39,29 @@ class ReportParserService
      */
     public function getReportsTree()
     {
-        if (null === $this->reportsTreeRoot) {
-            $this->parseReports();
-        }
+        $this->parseReports();
         return $this->reportsTreeRoot;
     }
 
     /**
-     * @throws ReportYmlInvalidException
+     * @param string $baseName
+     * @return Report
+     */
+    public function findOneByBaseName($baseName)
+    {
+        $this->parseReports();
+        return $this->reportsTreeRoot->reports->findOneByBaseName($baseName);
+    }
+
+    /**
+     * @throws ReportInvalidException
      */
     private function parseReports()
     {
+        if (null !== $this->reportsTreeRoot) {
+            return;
+        }
+
         $this->reportsTreeRoot = new ReportTreeNode;
 
         foreach ($this->fs->listContents() as $ymlFileMetadata) {
@@ -68,7 +86,7 @@ class ReportParserService
     /**
      * @param array $data
      * @return Report
-     * @throws ReportYmlInvalidException
+     * @throws ReportInvalidException
      */
     private function buildReport($path, array $data)
     {
@@ -78,7 +96,7 @@ class ReportParserService
             $report->filename = $path;
             $report->baseName = substr($path, 0, -4);
             $report->name = $this->getRequiredValue($data, 'name');
-            $report->description = $this->getRequiredValue($data, 'description');
+            $report->description = $this->getValue($data, 'description');
             $report->sql = $this->getRequiredValue($data, 'sql');
 
             if ($this->hasValue($data, 'limit')) {
@@ -95,9 +113,9 @@ class ReportParserService
 
             $report->orientation = $this->getValue($data, 'orientation', Report::ORIENTATION_VERTICAL);
         } catch (LimitLessThenOneException $e) {
-            throw new ReportYmlInvalidException($path, $e);
+            throw new ReportInvalidException($path, $e);
         } catch (NoKeyFoundException $e) {
-            throw new ReportYmlInvalidException($path, $e);
+            throw new ReportInvalidException($path, $e);
         }
 
         foreach ($this->getValue($data, 'parameters', []) as $placeholder => $pData) {
@@ -105,7 +123,7 @@ class ReportParserService
 
             $parameter = new Parameter();
             $parameter->placeholder = $placeholder;
-            $parameter->name = $this->getRequiredValue($pData, 'name');
+            $parameter->name = $this->getValue($pData, 'name', $parameter->placeholder);
             $parameter->input = $this->getValue($pData, 'input', Parameter::INPUT_RAW);
             $parameter->idOfEntity = $this->getValue($pData, 'idOfEntity');
             $parameter->default = $this->getValue($pData, 'default');
@@ -113,64 +131,51 @@ class ReportParserService
             $report->parameters->add($parameter);
         }
 
-        foreach ($this->getValue($data, 'columns', []) as $name => $cData) {
+        foreach ($this->getValue($data, 'columns', []) as $columnName => $cData) {
             $column = new Column();
-            $column->name = $name;
+            $column->name = $columnName;
 
             $idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
             if ([] !== $idOfEntities) {
                 $column->formatter = new IdOfEntitiesFormatter(['idOfEntities' => $idOfEntities]);
                 $column->idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
             } else {
-                $formatterOptionValue = $this->getValue($cData, 'format', 'raw');
-                $formatterClassName = '\\PODataHeaven\\CellFormatter\\' . ucfirst($formatterOptionValue) . 'Formatter';
-                if (!class_exists($formatterClassName)) {
-                    throw new FormatterNotFoundException($formatterOptionValue);
+                $formatterParameter = $this->getValue($cData, 'format', 'raw');
+
+                try {
+                    $column->formatter = $this->newObjectByClassName(
+                        'CellFormatter',
+                        $formatterParameter,
+                        'Formatter'
+                    );
+                } catch (ClassNotFoundException $e) {
+                    throw new FormatterNotFoundException($formatterParameter, $e);
                 }
 
-                $column->formatter = new $formatterClassName();
                 $column->idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
             }
 
             $report->columns->add($column);
         }
 
-        return $report;
-    }
+        foreach ($this->getValue($data, 'transformers', []) as $transformerData) {
+            $transformerName = key($transformerData);
+            $tData = reset($transformerData);
 
-    /**
-     * @param array $data
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    private function getValue(array $data, $key, $default = null)
-    {
-        return isset($data[$key]) ? $data[$key] : $default;
-    }
+            if (null === $tData) {
+                $tData = [];
+            }
 
-    /**
-     * @param array $data
-     * @param string $key
-     * @return bool
-     */
-    private function hasValue(array $data, $key)
-    {
-        return isset($data[$key]);
-    }
+            try {
+                $transformer = $this->newObjectByClassName('ReportTransformer', $transformerName, 'Transformer', $tData);
+            } catch (ClassNotFoundException $e) {
+                throw new TransformerNotFoundException($transformerName, $e);
+            }
 
-    /**
-     * @param array $data
-     * @param string $key
-     * @return mixed
-     * @throws NoKeyFoundException
-     */
-    private function getRequiredValue(array $data, $key)
-    {
-        if (!isset($data[$key]) || '' === trim($data[$key])) {
-            throw new NoKeyFoundException($key);
+            $report->transformers->add($transformer);
         }
-        return $data[$key];
+
+        return $report;
     }
 
     /**
@@ -178,9 +183,7 @@ class ReportParserService
      */
     public function getFailedReports()
     {
-        if (null === $this->reportsTreeRoot) {
-            $this->parseReports();
-        }
+        $this->parseReports();
         return $this->failedReports;
     }
 }

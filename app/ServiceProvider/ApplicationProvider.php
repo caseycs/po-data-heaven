@@ -4,6 +4,7 @@ namespace PODataHeaven\ServiceProvider;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use PODataHeaven\Service\DbStructureGeneratorService;
+use PODataHeaven\Service\DashboardParserService;
 use PODataHeaven\Service\MappingService;
 use PODataHeaven\Service\ReportExecutorService;
 use PODataHeaven\Service\ReportParserService;
@@ -37,8 +38,18 @@ class ApplicationProvider implements ServiceProviderInterface
             return $filesystem;
         };
 
+        $app['dashboard_filesystem.service'] = function () use ($app) {
+            $adapter = new Local(getenv('DASHBOARDS_DIR'));
+            $filesystem = new Filesystem($adapter);
+            return $filesystem;
+        };
+
         $app['report_parser.service'] = function () use ($app) {
             return new ReportParserService($app['reports_filesystem.service']);
+        };
+
+        $app['dashboard_parser.service'] = function () use ($app) {
+            return new DashboardParserService($app['dashboard_filesystem.service']);
         };
 
         $app['mapping.service'] = function () use ($app) {

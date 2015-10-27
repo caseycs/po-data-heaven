@@ -7,6 +7,6 @@ class TruncateFormatter extends AbstractFormatter
 {
     public function format($value, array $row = [])
     {
-        return $this->escape(util::limit_characters($value, $this->getOption('limit', 20)));
+        return $this->escape(util::limit_characters($value, $this->getParameter('limit', 20)));
     }
 }

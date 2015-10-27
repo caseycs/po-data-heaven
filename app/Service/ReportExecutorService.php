@@ -4,8 +4,9 @@ namespace PODataHeaven\Service;
 use Doctrine\DBAL\Connection;
 use PDO;
 use PODataHeaven\Container\ReportExecutionResult;
-use PODataHeaven\Exception\ReportParameterRequiredException;
+use PODataHeaven\Exception\ParameterMissingException;
 use PODataHeaven\Model\Report;
+use PODataHeaven\ReportTransformer\TransformerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ReportExecutorService
@@ -26,7 +27,7 @@ class ReportExecutorService
      * @param Report $report
      * @param ParameterBag $paramsPassed
      * @return ReportExecutionResult
-     * @throws ReportParameterRequiredException
+     * @throws ParameterMissingException
      */
     public function execute(Report $report, ParameterBag $paramsPassed)
     {
@@ -43,13 +44,15 @@ class ReportExecutorService
                 $params[$p->placeholder] = $values;
                 $paramsTypes[$p->placeholder] = Connection::PARAM_INT_ARRAY;
             } else {
-                throw new ReportParameterRequiredException($p->placeholder);
+                throw new ParameterMissingException($p->placeholder);
             }
         }
 
         $sql = $this->buildSql($report);
 
         $rows = $this->connection->fetchAll($sql, $params, $paramsTypes);
+
+        $rows = $this->transformRows($report, $rows);
 
         $result = new ReportExecutionResult();
         $result->rows = $rows;
@@ -59,6 +62,15 @@ class ReportExecutorService
         $this->mappingService->generateResultColumns($report, $result);
 
         return $result;
+    }
+
+    protected function transformRows(Report $report, array $rows)
+    {
+        /** @var TransformerInterface $transformer */
+        foreach ($report->transformers as $transformer) {
+            $rows = $transformer->transform($rows);
+        }
+        return $rows;
     }
 
     /**

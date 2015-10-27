@@ -17,14 +17,11 @@ A simplest one:
 ```
 name: Consumer details
 
-description: bla bla bla
-
 sql: >
  SELECT * FROM `user` WHERE id IN (:id)
 
 parameters:
   id:
-    name: user_id
 ```
 
 A complicated one:
@@ -36,12 +33,12 @@ name: Consumer details
 description: bla bla bla
 
 sql: >
- SELECT * FROM `user`
+ SELECT id, name, age, company_id, tmp FROM `user`
  WHERE company_id = :company_id AND type = :type
 
 parameters:
   company_id:
-    name: id of the company
+    name: id of tid company
     idOfEntity: company
   type:
     name: user type
@@ -61,4 +58,13 @@ columns:
     idOfEntities: [user_tag, company_tag]
   description:
     format: truncate
+    
+transformers:
+  - firstColumnRotate: #will not work for this report
+  - addTwigColumn:
+      after: id
+      name: nameAndAge
+      template: "{{ row['name'] }} AGE {{ row['age'] }}"
+  - removeColumn:
+      column: tmp
 ```

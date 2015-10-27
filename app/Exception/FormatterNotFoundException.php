@@ -1,13 +1,12 @@
 <?php
 namespace PODataHeaven\Exception;
 
+use Exception;
+
 class FormatterNotFoundException extends PODataHeavenException
 {
-    public $formatterOptionValue;
-
-    public function __construct($formatterOptionValue)
+    public function __construct($formatterOptionValue, Exception $prev = null)
     {
-        parent::__construct('Formatter not found: ' . $formatterOptionValue);
-        $this->formatterOptionValue = $formatterOptionValue;
+        parent::__construct('Formatter not found: ' . $formatterOptionValue, 0, $prev);
     }
 }
