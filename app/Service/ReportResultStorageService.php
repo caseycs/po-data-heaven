@@ -29,7 +29,7 @@ class ReportResultStorageService
 
         $schema = new Schema();
         $tableSchema = $schema->createTable($tableNameTmp);
-        $this->dbStructureGeneratorService->guessColumnTypes($result->rows, $tableSchema);
+        $this->dbStructureGeneratorService->guessColumnTypes($result->rows, $tableSchema, $this->connection);
         $createQueries = $schema->toSql($this->connection->getDatabasePlatform());
 
 //        ddd($createQueries);

@@ -2,6 +2,7 @@
 namespace PODataHeaven\Service;
 
 use Doctrine\DBAL\Schema\Table;
+use utilphp\util;
 
 class DbStructureGeneratorService
 {
@@ -48,21 +49,30 @@ class DbStructureGeneratorService
         //generate table structure
         foreach ($columns as $name => $data) {
             if ($data['numeric'] && !$data['max_decimal_numbers']) {
-                $tableSchema->addColumn($name, 'integer', ['notnull' => !$data['null']]);
+                $tableSchema->addColumn($this->normalizeColumnName($name), 'integer', ['notnull' => !$data['null']]);
             } elseif ($data['numeric'] && $data['max_decimal_numbers']) {
                 $properties = [
                     'precision' => $data['max_int_numbers'] + $data['max_decimal_numbers'],
                     'scale' => $data['max_decimal_numbers'],
                     'notnull' => !$data['null']
                 ];
-                $tableSchema->addColumn($name, 'decimal', $properties);
+                $tableSchema->addColumn($this->normalizeColumnName($name), 'decimal', $properties);
             } else {
                 $tableSchema->addColumn(
-                    $name,
+                    $this->normalizeColumnName($name),
                     'string',
                     ['length' => $data['max_length'], 'notnull' => !$data['null']]
                 );
             }
         }
+    }
+
+    /**
+     * @param string $column
+     * @return mixed
+     */
+    private function normalizeColumnName($column)
+    {
+        return str_replace(' ', '', lcfirst(ucwords(util::slugify($column, ' '))));
     }
 }

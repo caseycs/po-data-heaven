@@ -27,6 +27,12 @@ class DbStructureGeneratorServiceTest extends PHPUnit_Framework_TestCase
                 ],
                 ['CREATE TABLE tmp (a INT NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB'],
             ],
+            'slugify column name' => [
+                [
+                    ['Mega Title Bla' => '1'],
+                ],
+                ['CREATE TABLE tmp (megaTitleBla INT NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB'],
+            ],
             'int and string' => [
                 [
                     ['a' => '1'],
