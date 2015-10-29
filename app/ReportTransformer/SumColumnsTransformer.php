@@ -18,7 +18,7 @@ class SumColumnsTransformer extends AbstractParameterContainer implements Transf
         foreach ($rows as $row) {
             $sum = null;
             foreach ($sourceColumns as $key) {
-                if (!isset($row[$key])) {
+                if (!array_key_exists($key, $row)) {
                     throw new ColumnNotFoundException($key);
                 }
                 if ($sum === null) {
