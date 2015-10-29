@@ -32,6 +32,8 @@ class LeafletJsGeoDashboardView extends DashboardViewAbstract implements Dashboa
             }
         }
 
+        $latAll = [];
+        $lonAll = [];
         foreach ($reportExecutionResult->rows as $rowSource) {
             if (!$rowSource[$latKey] || !$rowSource[$lonKey]) {
                 continue;
@@ -46,11 +48,24 @@ class LeafletJsGeoDashboardView extends DashboardViewAbstract implements Dashboa
                 'color' => $this->getHexColorBetweenGreenAndRed($rowSource[$colorKey] / 1),
                 'title' => $rowSource[$titleKey],
             ];
+
+            $latAll[] = $rowSource[$latKey];
+            $lonAll[] = $rowSource[$lonKey];
+        }
+
+        if ($this->getParameter('centerLat') && $this->getParameter('centerLon')) {
+            $centerLat = $this->getParameter('centerLat');
+            $centerLon = $this->getParameter('centerLon');
+        } else {
+            $centerLat = array_sum($latAll) / count($latAll);
+            $centerLon = array_sum($lonAll) / count($lonAll);
         }
 
         return [
             'rows' => $rows2js,
             'params' => $this->parameters,
+            'centerLat' => $centerLat,
+            'centerLon' => $centerLon,
         ];
     }
 
