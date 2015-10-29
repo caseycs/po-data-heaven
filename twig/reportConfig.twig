@@ -10,11 +10,13 @@
         </a>
     </h2>
 
-    <h3>Legend</h3>
+    {% if report.description %}
+        <h3>Legend</h3>
 
-    <p>
-        {{ report.description }}
-    </p>
+        <p>
+            {{ report.description }}
+        </p>
+    {% endif %}
 
     <h3>Parameters</h3>
 
