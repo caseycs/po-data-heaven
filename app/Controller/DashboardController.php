@@ -53,7 +53,7 @@ class DashboardController
         $templateData = $dashboard->view->getTemplateData($reportExecutionResult);
 
         //append predefined
-        $templateData = array_merge($templateData, ['dashboard' => $dashboard, 'report' => $report]);
+        $templateData = array_merge($templateData, ['dashboard' => $dashboard, 'report' => $report, 'editDashboardUrlPrefix']);
 
         return $this->twig->render($dashboard->view->getTemplate() . '.twig', $templateData);
     }

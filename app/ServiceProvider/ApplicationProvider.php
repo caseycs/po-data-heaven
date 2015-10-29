@@ -23,6 +23,7 @@ class ApplicationProvider implements ServiceProviderInterface
 
         //global template variables
         $te->addGlobal('editReportUrlPrefix', getenv('EDIT_REPORT_URL_PREFIX'));
+        $te->addGlobal('editDashboardUrlPrefix', getenv('EDIT_DASHBOARD_URL_PREFIX'));
 
         $app['reports_filesystem.service'] = function () use ($app) {
             $adapter = new Local(getenv('REPORTS_DIR'));

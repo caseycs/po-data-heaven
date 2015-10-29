@@ -1,22 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ dashboard.name }}</title>
-    <link rel="stylesheet" href="//yastatic.net/bootstrap/3.3.4/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/leaflet.css"/>
+{% extends '_layoutReport.twig' %}
+
+{% block title %}
+{{ dashboard.name }}
+{% endblock %}
+
+{% block javascript %}
     <script type="text/javascript" src="/leaflet.js"></script>
-</head>
-
-<body>
-<div class="container">
-    <h1>{{ dashboard.name }}</h1>
-
-    <div id="map" style="width: 100%; height: 550px"></div>
-
-    <script src="/leaflet.js"></script>
     <script>
         var data = {{ rows|json_encode|raw }};
         var params = {{ params|json_encode|raw }};
@@ -47,8 +36,35 @@
         }
 
     </script>
+{% endblock %}
 
-</div>
+{% block css %}
+    <link rel="stylesheet" href="/leaflet.css"/>
+    <style>
+        #map {
+            width:100%;
+            height:550px;
+            /*min-height: 100%;*/
+            /*height: 100%;*/
+            margin:2em 0;
+        }
+    </style>
+{% endblock %}
 
-</body>
-</html>
+{% block content %}
+    <h2>
+        <a href="/">H</a> >
+        {{ dashboard.name }}
+        <a href="{{ editDashboardUrlPrefix }}{{ dashboard.filename }}" target="_blank" title="Edit">
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true" style="font-size:.6em"></span>
+        </a>
+    </h2>
+
+    <div id="map"></div>
+
+    <p>Based on report: <a href="/report/{{ report.baseName }}">{{ report.name }}</a></p>
+    <ul>
+        <li>Circle size: <strong>{{ dashboard.parameters.size }}</strong></li>
+        <li>Circle color: <strong>{{ dashboard.parameters.color }}</strong></li>
+    </ul>
+{% endblock %}
