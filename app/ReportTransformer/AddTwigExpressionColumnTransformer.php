@@ -37,7 +37,7 @@ class AddTwigExpressionColumnTransformer extends AbstractParameterContainer impl
         $result = [];
         foreach ($rows as $row) {
             try {
-                $newColumnContent = $twigEnvironment->render('column', $row);
+                $newColumnContent = $twigEnvironment->render('column', array_merge($row, ['_row' => $row]));
             } catch (Twig_Error_Syntax $e) {
                 throw new InvalidExpressionException($e);
             }
