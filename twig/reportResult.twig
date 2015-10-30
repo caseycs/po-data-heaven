@@ -34,7 +34,9 @@
             {% for row in result.rows %}
                 <tr>
                     {% for c in result.columns %}
-                        <td>{{ c.formatter.format(row[c.name])|raw }}</td>
+                        <td class="text-{{ c.align }}">
+                            {{ c.formatter.format(row[c.name])|raw }}
+                        </td>
                     {% endfor %}
                 </tr>
             {% endfor %}
