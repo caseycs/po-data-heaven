@@ -1,8 +1,4 @@
-{% extends '_layoutReport.twig' %}
-
-{% block title %}
-{{ dashboard.name }}
-{% endblock %}
+{% extends 'dashboard/_layoutDashboard.twig' %}
 
 {% block javascript %}
     <script type="text/javascript" src="/leaflet.js"></script>
@@ -54,18 +50,10 @@
     </style>
 {% endblock %}
 
-{% block content %}
-    <h2>
-        <a href="/">H</a> >
-        {{ dashboard.name }}
-        <a href="{{ editDashboardUrlPrefix }}{{ dashboard.filename }}" target="_blank" title="Edit">
-            <span class="glyphicon glyphicon-pencil" aria-hidden="true" style="font-size:.6em"></span>
-        </a>
-    </h2>
-
+{% block dashboardContent %}
     <div id="map"></div>
 
-    <p>Based on report: <a href="/report/{{ report.baseName }}">{{ report.name }}</a></p>
+    <p>Parameters:</p>
     <ul>
         <li>Circle size: <strong>{{ dashboard.parameters.size }}</strong></li>
         <li>Circle color: <strong>{{ dashboard.parameters.color }}</strong></li>

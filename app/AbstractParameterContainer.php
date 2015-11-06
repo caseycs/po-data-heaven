@@ -1,6 +1,7 @@
 <?php
 namespace PODataHeaven;
 
+use PODataHeaven\Exception\ParameterInvalidException;
 use PODataHeaven\Exception\ParameterMissingException;
 
 abstract class AbstractParameterContainer
@@ -24,7 +25,7 @@ abstract class AbstractParameterContainer
      */
     final protected function hasParameter($key)
     {
-        return isset($this->parameters[$key]);
+        return array_key_exists($key, $this->parameters);
     }
 
     /**
@@ -36,6 +37,36 @@ abstract class AbstractParameterContainer
     {
         if (!isset($this->parameters[$key])) {
             throw new ParameterMissingException($key);
+        }
+        return $this->parameters[$key];
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     * @throws ParameterMissingException
+     * @throws ParameterInvalidException
+     */
+    final protected function getRequiredScalarParameter($key)
+    {
+        $value = $this->getRequiredParameter($key);
+        if (!is_scalar($value)) {
+            throw new ParameterInvalidException($key, $value);
+        }
+        return $this->parameters[$key];
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     * @throws ParameterMissingException
+     * @throws ParameterInvalidException
+     */
+    final protected function getRequiredArrayParameter($key)
+    {
+        $value = $this->getRequiredParameter($key);
+        if (!is_array($value)) {
+            throw new ParameterInvalidException($key, $value);
         }
         return $this->parameters[$key];
     }
