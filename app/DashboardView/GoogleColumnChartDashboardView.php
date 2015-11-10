@@ -2,6 +2,7 @@
 namespace PODataHeaven\DashboardView;
 
 use PODataHeaven\Container\ReportExecutionResult;
+use PODataHeaven\Exception\ColumnNotFoundException;
 
 class GoogleColumnChartDashboardView extends DashboardViewAbstract implements DashboardViewInterface
 {
@@ -13,15 +14,26 @@ class GoogleColumnChartDashboardView extends DashboardViewAbstract implements Da
     public function getTemplateData(ReportExecutionResult $reportExecutionResult)
     {
         $data = [$this->getRequiredParameter('stack')];
+        $barLegend = $this->getRequiredScalarParameter('barLegend');
+
         $data[0][] = ['role' => 'annotation'];
-        array_unshift($data[0], $this->getRequiredScalarParameter('barLegend'));
+
+        array_unshift($data[0], $barLegend);
 
         $treatValuesAsPercentage = $this->hasParameter('treatValuesAsPercentage');
 
         foreach ($reportExecutionResult->rows as $row) {
-            $tmp = [$row[$this->getRequiredScalarParameter('barLegend')]];
+            if (!array_key_exists($barLegend, $row)) {
+                throw new ColumnNotFoundException($barLegend);
+            }
+
+            $tmp = [$row[$barLegend]];
 
             foreach ($this->getRequiredArrayParameter('stack') as $key) {
+                if (!array_key_exists($key, $row)) {
+                    throw new ColumnNotFoundException($key);
+                }
+
                 $tmp[] = $treatValuesAsPercentage ? round((float)$row[$key] * 100, 2) : (float)$row[$key];
             }
             $tmp[] = '';
