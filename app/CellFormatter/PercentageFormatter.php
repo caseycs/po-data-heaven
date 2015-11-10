@@ -5,6 +5,6 @@ class PercentageFormatter extends AbstractFormatter
 {
     public function format($value, array $row = [])
     {
-        return round($value * 100, 2) . '%';
+        return number_format($value * 100, 2, '.', '') . '%';
     }
 }

@@ -5,7 +5,7 @@ use PODataHeaven\Exception\ColumnNotFoundException;
 use PODataHeaven\AbstractParameterContainer;
 use PODataHeaven\Exception\ParameterMissingException;
 
-class RotateAroundColumnTransformer extends AbstractParameterContainer implements TransformerInterface
+class RotateAroundColumn2Transformer extends AbstractParameterContainer implements TransformerInterface
 {
     public function transform(array $rows)
     {
@@ -25,7 +25,7 @@ class RotateAroundColumnTransformer extends AbstractParameterContainer implement
             $row[$pivotColumn] = $key;
 
             foreach ($allColumnCombinations as $columnsHash => $columns) {
-                $columnName = join(', ', $columns);
+                $columnName = join(',', $columns);
                 $row[$columnName] = isset($rowPreProcessed[0][$columnsHash]) ? $rowPreProcessed[0][$columnsHash] : null;
             }
 
@@ -58,7 +58,7 @@ class RotateAroundColumnTransformer extends AbstractParameterContainer implement
                 if (!array_key_exists($col, $row)) {
                     throw new ColumnNotFoundException($col);
                 }
-                $combineColumnsData[] = $row[$col];
+                $combineColumnsData[] = $col . '=' . (null === $row[$col] ? 'NULL' : $row[$col]);
                 unset($row[$col]);
             }
 
