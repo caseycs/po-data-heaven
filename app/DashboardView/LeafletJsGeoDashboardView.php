@@ -43,7 +43,7 @@ class LeafletJsGeoDashboardView extends DashboardViewAbstract implements Dashboa
                 'lat' => $rowSource[$latKey],
                 'lon' => $rowSource[$lonKey],
                 'sizeRaw' => $rowSource[$sizeKey],
-                'size' => log10($rowSource[$sizeKey] / $maxSize),
+                'size' => $rowSource[$sizeKey] === null ? 0 : log10($rowSource[$sizeKey] / $maxSize),
                 'colorRaw' => round($rowSource[$colorKey] * 100, 2) . '%',
                 'color' => $this->getHexColorBetweenGreenAndRed($rowSource[$colorKey] / 1),
                 'title' => $rowSource[$titleKey],
