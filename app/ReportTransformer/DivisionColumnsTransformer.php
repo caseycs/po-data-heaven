@@ -17,13 +17,20 @@ class DivisionColumnsTransformer extends AbstractParameterContainer implements T
 
         $result = [];
         foreach ($rows as $row) {
-            if (!isset($row[$dividendColumn])) {
+            if (!array_key_exists($dividendColumn, $row)) {
                 throw new ColumnNotFoundException($dividendColumn);
             }
-            if (!isset($row[$divisorColumn])) {
+            if (!array_key_exists($divisorColumn, $row)) {
                 throw new ColumnNotFoundException($divisorColumn);
             }
-            $row[$resultColumn] = $row[$dividendColumn] / $row[$divisorColumn];
+
+            if ($row[$divisorColumn] != 0) {
+                $resultValue = $row[$dividendColumn] / $row[$divisorColumn];
+            } else {
+                $resultValue = null;
+            }
+
+            $row[$resultColumn] = $resultValue;
             $result[] = $row;
         }
         return $result;

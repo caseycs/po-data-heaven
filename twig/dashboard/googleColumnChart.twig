@@ -1,0 +1,31 @@
+{% extends 'dashboard/_layoutDashboard.twig' %}
+
+{% block javascript %}
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script>
+        var reportData = {{ data|json_encode|raw }}
+        ;
+    </script>
+    <script>
+        google.load('visualization', '1', {packages: ['corechart', 'bar']});
+        google.setOnLoadCallback(drawAnnotations);
+
+        function drawAnnotations() {
+            var data = google.visualization.arrayToDataTable(reportData);
+
+            var options = {
+                width: 900,
+                height: 500,
+                legend: { position: 'top', maxLines: 3 },
+                isStacked: true
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+    </script>
+{% endblock %}
+
+{% block dashboardContent %}
+    <div id="chart_div"></div>
+{% endblock %}

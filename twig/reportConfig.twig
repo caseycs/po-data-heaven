@@ -1,19 +1,22 @@
-{% extends '_layout.twig' %}
+{% extends '_layoutReport.twig' %}
 
 {% block content %}
 
     <h2>
+        <a href="/">H</a> >
         Report: <code>{{ report.name }}</code>
         <a href="{{ editReportUrlPrefix }}{{ report.filename }}" target="_blank" title="Edit">
             <span class="glyphicon glyphicon-pencil" aria-hidden="true" style="font-size:.6em"></span>
         </a>
     </h2>
 
-    <h3>Legend</h3>
+    {% if report.description %}
+        <h3>Legend</h3>
 
-    <p>
-        {{ report.description }}
-    </p>
+        <p>
+            {{ report.description }}
+        </p>
+    {% endif %}
 
     <h3>Parameters</h3>
 

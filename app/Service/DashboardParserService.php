@@ -93,6 +93,8 @@ class DashboardParserService
         $viewValue = $this->getRequiredValue($data, 'view');
         $parameters = $this->getValue($data, 'parameters', []);
 
+        $dashboard->parameters = $parameters;
+
         $view = $this->newObjectByClassName('DashboardView', $viewValue, 'DashboardView', $parameters);
         $dashboard->view = $view;
 

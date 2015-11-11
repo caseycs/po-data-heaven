@@ -5,6 +5,25 @@ use PODataHeaven\ReportTransformer\AddTwigExpressionColumnTransformer;
 
 class AddTwigExpressionColumnTransformerTest extends \PHPUnit_Framework_TestCase
 {
+    public function test_successRowAsArray()
+    {
+        $transformer = new AddTwigExpressionColumnTransformer(['after' => 'city', 'name' => 'new', 'expression' => "_row['city'] ~ ' A'"]);
+
+        $input = [
+            ['city' => 'Amsterdam'],
+            ['city' => 'Rotterdam'],
+        ];
+
+        $result = $transformer->transform($input);
+
+        $expected = [
+            ['city' => 'Amsterdam', 'new' => 'Amsterdam A'],
+            ['city' => 'Rotterdam', 'new' => 'Rotterdam A'],
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
+
     public function test_successAfter()
     {
         $transformer = new AddTwigExpressionColumnTransformer(['after' => 'city', 'name' => 'new', 'expression' => "city ~ ' A'"]);

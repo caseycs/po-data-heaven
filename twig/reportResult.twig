@@ -1,8 +1,9 @@
-{% extends '_layout.twig' %}
+{% extends '_layoutReport.twig' %}
 
 {% block content %}
 
     <h2>
+        <a href="/">H</a> >
         Report: <code>{{ report.name }}</code>
         <a href="{{ csvUrl }}" title="Download CSV">
             <span class="glyphicon glyphicon-download-alt" aria-hidden="true" style="font-size:.6em"></span>
@@ -33,7 +34,9 @@
             {% for row in result.rows %}
                 <tr>
                     {% for c in result.columns %}
-                        <td>{{ c.formatter.format(row[c.name])|raw }}</td>
+                        <td class="text-{{ c.align }}">
+                            {{ c.formatter.format(row[c.name])|raw }}
+                        </td>
                     {% endfor %}
                 </tr>
             {% endfor %}
@@ -46,11 +49,13 @@
 
     {% endif %}
 
-    <h3>Legend</h3>
+    {% if report.description %}
+        <h3>Legend</h3>
 
-    <p>
-        {{ report.description }}
-    </p>
+        <p>
+            {{ report.description }}
+        </p>
+    {% endif %}
 
     <h3>Raw SQL</h3>
     {{ result.sql|sqlFormatter|raw }}

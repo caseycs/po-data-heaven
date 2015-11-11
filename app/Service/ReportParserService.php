@@ -8,6 +8,7 @@ use PODataHeaven\Exception\ClassNotFoundException;
 use PODataHeaven\Exception\FormatterNotFoundException;
 use PODataHeaven\Exception\LimitLessThenOneException;
 use PODataHeaven\Exception\NoKeyFoundException;
+use PODataHeaven\Exception\ParameterInvalidException;
 use PODataHeaven\Exception\PODataHeavenException;
 use PODataHeaven\Exception\ReportInvalidException;
 use PODataHeaven\Exception\TransformerNotFoundException;
@@ -134,6 +135,14 @@ class ReportParserService
         foreach ($this->getValue($data, 'columns', []) as $columnName => $cData) {
             $column = new Column();
             $column->name = $columnName;
+
+            if (null !== $cData) {
+                $column->align = $this->getValue($cData, 'align', Column::ALIGN_LEFT);
+                $valid = [Column::ALIGN_LEFT, Column::ALIGN_RIGHT, Column::ALIGN_CENTER];
+                if (!in_array($column->align, $valid, true)) {
+                    throw new ParameterInvalidException('align', $column->align);
+                }
+            }
 
             $idOfEntities = (array)$this->getValue($cData, 'idOfEntities');
             if ([] !== $idOfEntities) {
