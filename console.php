@@ -1,4 +1,5 @@
 <?php
+use PODataHeaven\ConsoleCommand\DenormalizerConsoleCommand;
 use PODataHeaven\Service\ReportExecutorService;
 use PODataHeaven\Service\ReportParserService;
 use PODataHeaven\Service\ReportResultStorageService;
@@ -21,36 +22,39 @@ $app = new PoDataHeavenApplication();
 $console = new Application('My Silex Application', 'n/a');
 $console->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', 'dev'));
 $console->setDispatcher($app['dispatcher']);
-$console
-    ->register('store-report-result')
-    ->setDefinition(array(
-         new InputArgument('report', InputArgument::REQUIRED),
-         new InputArgument('table', InputArgument::REQUIRED),
-         new InputOption('chunk', 'c', InputOption::VALUE_OPTIONAL, 'rows per batch insert query', '100'),
-    ))
-    ->setDescription('My command description')
-    ->setCode(function (InputInterface $input, OutputInterface $output) use ($app) {
-        /** @var ReportParserService $reportService */
-        $reportService = $app['report_parser.service'];
 
-        /** @var ReportExecutorService $reportExecutorService */
-        $reportExecutorService = $app['report_executor.service'];
+//$console
+//    ->register('store-report-result')
+//    ->setDefinition(array(
+//         new InputArgument('report', InputArgument::REQUIRED),
+//         new InputArgument('table', InputArgument::REQUIRED),
+//         new InputOption('chunk', 'c', InputOption::VALUE_OPTIONAL, 'rows per batch insert query', '100'),
+//    ))
+//    ->setDescription('My command description')
+//    ->setCode(function (InputInterface $input, OutputInterface $output) use ($app) {
+//        /** @var ReportParserService $reportService */
+//        $reportService = $app['report_parser.service'];
+//
+//        /** @var ReportExecutorService $reportExecutorService */
+//        $reportExecutorService = $app['report_executor.service'];
+//
+//        /** @var ReportResultStorageService $storageService */
+//        $storageService = $app['report_result_storage.service'];
+//
+//        $output->writeln('Start');
+//
+//        $report = $reportService->findOneByBaseName($input->getArgument('report'));
+//
+//        $output->writeln('Executing report');
+//        $result = $reportExecutorService->execute($report, new ParameterBag());
+//
+//        $output->writeln('Storing result rows');
+//        $storageService->store($result, $input->getArgument('table'), $input->getOption('chunk'));
+//
+//        $output->writeln('Done');
+//    })
+//;
 
-        /** @var ReportResultStorageService $storageService */
-        $storageService = $app['report_result_storage.service'];
-
-        $output->writeln('Start');
-
-        $report = $reportService->findOneByBaseName($input->getArgument('report'));
-
-        $output->writeln('Executing report');
-        $result = $reportExecutorService->execute($report, new ParameterBag());
-
-        $output->writeln('Storing result rows');
-        $storageService->store($result, $input->getArgument('table'), $input->getOption('chunk'));
-
-        $output->writeln('Done');
-    })
-;
+$console->add(new DenormalizerConsoleCommand($app['denormalizer_parser.service'], $app['db'], $app['dbs']['reports']));
 
 $console->run();
