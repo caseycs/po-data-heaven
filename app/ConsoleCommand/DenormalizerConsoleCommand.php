@@ -76,41 +76,25 @@ class DenormalizerConsoleCommand extends Command
         $sql = sprintf('DROP TABLE IF EXISTS %s', $this->targetConnection->quoteIdentifier($tableNameTmp));
         $this->targetConnection->exec($sql);
 
-        //create tmp table
-        $schema = new Schema();
-        $tableSchema = $schema->createTable($tableNameTmp);
-        foreach ($config['columns'] as $name => $columnDetails) {
-            if (is_string($columnDetails)) {
-                $type = $columnDetails;
-                $options = [];
-            } elseif (is_array($columnDetails)) {
-                $type = $columnDetails['type'];
-                $options = isset($columnDetails['options']) ? $columnDetails['options'] : [];
-            } else {
-                throw new \Exception;
-            }
-            $tableSchema->addColumn($name, $type, $options);
-        }
-        $createQueries = $schema->toSql($this->targetConnection->getDatabasePlatform());
-
-        $output->writeln("creating table $tableNameTmp");
-        foreach ($createQueries as $sql) {
-            $this->targetConnection->exec($sql);
-        }
-
         $min = $this->sourceConnection->fetchColumn($config['sqlMinId']);
         $max = $this->sourceConnection->fetchColumn($config['sqlMaxId']);
 
-        $statement = $this->sourceConnection->prepare($config['sqlData']);
+        $tableCreated = false;
 
         for ($i = $min; $i <= $max; $i += $config['batch']) {
-            $maxTmp = $i + $config['batch'];
+            $maxTmp = $i + $config['batch'] - 1;
             $output->writeln("fetching from $i to $maxTmp");
 
             $params = ['min' => $i, 'max' => $maxTmp];
             $chunk = $this->sourceConnection->fetchAll($config['sqlData'], $params);
             if (!count($chunk)) {
                 continue;
+            }
+
+            if (!$tableCreated) {
+                $this->createTable($tableNameTmp, $config, array_keys(reset($chunk)));
+                $tableCreated = true;
+
             }
 
             //insert
@@ -152,5 +136,42 @@ class DenormalizerConsoleCommand extends Command
         $this->targetConnection->exec($sql);
 
         $output->writeln("done");
+    }
+
+    protected function createTable($tableNameTmp, $config, array $firstRowKeys)
+    {
+        $configuredColumns = array_keys($config['columns']);
+
+        $tmp = array_diff($firstRowKeys, $configuredColumns);
+        if ($tmp) {
+            throw new \Exception('columns not configured in yml: ' . join(', ', $tmp));
+        }
+
+        $tmp = array_diff($configuredColumns, $firstRowKeys);
+        if ($tmp) {
+            throw new \Exception('columns not exists int the query: ' . join(', ', $tmp));
+        }
+
+        $schema = new Schema();
+        $tableSchema = $schema->createTable($tableNameTmp);
+        foreach ($firstRowKeys as $name) {
+            $columnDetails = $config['columns'][$name];
+
+            if (is_string($columnDetails)) {
+                $type = $columnDetails;
+                $options = [];
+            } elseif (is_array($columnDetails)) {
+                $type = $columnDetails['type'];
+                $options = isset($columnDetails['options']) ? $columnDetails['options'] : [];
+            } else {
+                throw new \Exception;
+            }
+            $tableSchema->addColumn($name, $type, $options);
+        }
+        $createQueries = $schema->toSql($this->targetConnection->getDatabasePlatform());
+
+        foreach ($createQueries as $sql) {
+            $this->targetConnection->exec($sql);
+        }
     }
 }
