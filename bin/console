@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+use Dotenv\Dotenv;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$dotenv = new Dotenv(__DIR__.  '/..');
+$dotenv->load();
+
+$console = require __DIR__ . '/../console.php';
+$console->run();
