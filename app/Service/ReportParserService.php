@@ -12,6 +12,7 @@ use PODataHeaven\Exception\ParameterInvalidException;
 use PODataHeaven\Exception\PODataHeavenException;
 use PODataHeaven\Exception\ReportInvalidException;
 use PODataHeaven\Exception\TransformerNotFoundException;
+use PODataHeaven\Exception\UnknownDatabaseConnectionException;
 use PODataHeaven\GetParameterFromArrayKeyTrait;
 use PODataHeaven\Model\Column;
 use PODataHeaven\Model\Parameter;
@@ -30,9 +31,13 @@ class ReportParserService
     /** @var array */
     private $failedReports = [];
 
-    public function __construct(Filesystem $fs)
+    /** @var array */
+    private $validDatabaseConnections;
+
+    public function __construct(Filesystem $fs, $validDatabaseConnections)
     {
         $this->fs = $fs;
+        $this->validDatabaseConnections = $validDatabaseConnections;
     }
 
     /**
@@ -85,6 +90,7 @@ class ReportParserService
     }
 
     /**
+     * @param string $path
      * @param array $data
      * @return Report
      * @throws ReportInvalidException
@@ -99,6 +105,12 @@ class ReportParserService
             $report->name = $this->getRequiredValue($data, 'name');
             $report->description = $this->getValue($data, 'description');
             $report->sql = $this->getRequiredValue($data, 'sql');
+
+            $connection = $this->getValue($data, 'connection', 'db');
+            if (!in_array($connection, $this->validDatabaseConnections, true)) {
+                throw new UnknownDatabaseConnectionException($connection);
+            }
+            $report->connection = $this->getValue($data, 'connection', 'db');
 
             if ($this->hasValue($data, 'limit')) {
                 $limit = (int)$this->getValue($data, 'limit');

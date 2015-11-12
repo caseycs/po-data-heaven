@@ -3,6 +3,7 @@ namespace PODataHeaven\Service;
 
 use Doctrine\DBAL\Connection;
 use PDO;
+use Pimple;
 use PODataHeaven\Container\ReportExecutionResult;
 use PODataHeaven\Exception\ParameterMissingException;
 use PODataHeaven\Model\Report;
@@ -17,9 +18,13 @@ class ReportExecutorService
     /** @var MappingService */
     private $mappingService;
 
-    public function __construct(Connection $connection, MappingService $mappingService)
+    /**
+     * @param Pimple[] $connections
+     * @param MappingService $mappingService
+     */
+    public function __construct(Pimple $connections, MappingService $mappingService)
     {
-        $this->connection = $connection;
+        $this->connections = $connections;
         $this->mappingService = $mappingService;
     }
 
@@ -50,7 +55,8 @@ class ReportExecutorService
 
         $sql = $this->buildSql($report);
 
-        $rows = $this->connection->fetchAll($sql, $params, $paramsTypes);
+        $connection = $this->connections[$report->connection];
+        $rows = $connection->fetchAll($sql, $params, $paramsTypes);
 
         $rows = $this->transformRows($report, $rows);
 

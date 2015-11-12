@@ -53,7 +53,7 @@ class ApplicationProvider implements ServiceProviderInterface
         };
 
         $app['report_parser.service'] = function () use ($app) {
-            return new ReportParserService($app['reports_filesystem.service']);
+            return new ReportParserService($app['reports_filesystem.service'], $app['dbs']->keys());
         };
 
         $app['dashboard_parser.service'] = function () use ($app) {
@@ -69,7 +69,7 @@ class ApplicationProvider implements ServiceProviderInterface
         };
 
         $app['report_executor.service'] = function () use ($app) {
-            return new ReportExecutorService($app['db'], $app['mapping.service']);
+            return new ReportExecutorService($app['dbs'], $app['mapping.service']);
         };
 
         $app['db_structure_generator.service'] = function () use ($app) {
