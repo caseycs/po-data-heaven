@@ -26,7 +26,7 @@
             <thead>
             <tr>
                 {% for column in result.columns %}
-                    <th style="word-break: break-all">{{ column.name }}</th>
+                    <th>{{ column.name|replace({'_': '_<wbr>'}) | raw }}</th>
                 {% endfor %}
             </tr>
             </thead>

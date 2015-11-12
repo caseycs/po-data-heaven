@@ -6,11 +6,15 @@ use PODataHeaven\Exception\ColumnNotFoundException;
 
 class DivisionColumnsTransformer extends AbstractParameterContainer implements TransformerInterface
 {
+    use AddColumnTrait;
+
     /**
      * {@inheritdoc}
      */
     public function transform(array $rows)
     {
+        $this->prepareAddColumn(reset($rows));
+
         $dividendColumn = $this->getRequiredParameter('dividend');
         $divisorColumn = $this->getRequiredParameter('divisor');
         $resultColumn = $this->getRequiredParameter('result');
@@ -30,7 +34,8 @@ class DivisionColumnsTransformer extends AbstractParameterContainer implements T
                 $resultValue = null;
             }
 
-            $row[$resultColumn] = $resultValue;
+            $row = $this->addColumn($row, $resultColumn, $resultValue);
+
             $result[] = $row;
         }
         return $result;
