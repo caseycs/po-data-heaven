@@ -12,18 +12,20 @@
 </head>
 
 <body>
-<div class="container">
+{% block containerWrapper %}
+    <div class="container">
 
-    {% block container %}
-        <div class="page-header">
-            <h1><a href="/">Product Owner Data Heaven</a></h1>
-        </div>
+        {% block container %}
+            <div class="page-header">
+                <h1><a href="/">Product Owner Data Heaven</a></h1>
+            </div>
 
-        {% block content %}
+            {% block content %}
+            {% endblock %}
         {% endblock %}
-    {% endblock %}
 
-</div>
+    </div>
+{% endblock %}
 
 <script type="text/javascript" src="//yastatic.net/jquery/2.1.4/jquery.min.js"></script>
 <script type="text/javascript" src="/main.js"></script>

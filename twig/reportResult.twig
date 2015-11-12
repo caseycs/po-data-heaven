@@ -1,4 +1,4 @@
-{% extends '_layoutReport.twig' %}
+{% extends '_layoutReportResult.twig' %}
 
 {% block content %}
 
@@ -26,7 +26,7 @@
             <thead>
             <tr>
                 {% for column in result.columns %}
-                    <th data-sortable="true">{{ column.name }}</th>
+                    <th style="word-break: break-all">{{ column.name }}</th>
                 {% endfor %}
             </tr>
             </thead>
