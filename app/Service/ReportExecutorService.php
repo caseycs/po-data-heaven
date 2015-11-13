@@ -89,15 +89,24 @@ class ReportExecutorService
         $sqlGenerated = $sql;
         foreach ($params as $param => $value) {
             if (is_array($value)) {
-                $connection = $this->connection;
+                $connection = $this->getFirstConnection();
                 $quotedArray = array_map(function ($v) use ($connection) {return $connection->quote($v);}, $value);
                 $valueQuoted = join(',', $quotedArray);
             } else {
-                $valueQuoted = $this->connection->quote($value);
+                $valueQuoted = $this->getFirstConnection()->quote($value);
             }
             $sqlGenerated = str_replace(':' . $param, $valueQuoted, $sqlGenerated);
         }
         return $sqlGenerated;
+    }
+
+    /**
+     * @return Connection
+     */
+    protected function getFirstConnection()
+    {
+        $keys = $this->connections->keys();
+        return $this->connections[reset($keys)];
     }
 
     /**
