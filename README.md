@@ -55,14 +55,14 @@ transformers:
 
 Input
 
-```
-[[d: 4, c:3, b: 2, a: 1]]
+```json
+[['d': 4, 'c':3, 'b': 2, 'a': 1]]
 ```
 
 Output
 
-```
-[[a: 1, b:2, c: 3]]
+```json
+[['a': 1, 'b':2, 'c': 3]]
 ```
 
 ## Cell formatters
