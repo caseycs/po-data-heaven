@@ -55,14 +55,14 @@ transformers:
 
 Input
 
-```json
-[["d" : 4, "c" : 3, "b" : 2, "a" : 1]]
+```
+[[d:4, c:3, b:2, a:1]]
 ```
 
 Output
 
-```json
-[["a" : 1, "b" : 2, "c" : 3]]
+```
+[[a:1, b:2, c:3]]
 ```
 
 ## Cell formatters
