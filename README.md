@@ -85,3 +85,26 @@ columns:
         optionName2: optionValue2
 ```
 
+### mysqlDate
+
+Reorders column to the defined order and drop all others.
+
+```
+columns:
+ value:
+  format: mysqlDate
+  options:
+   format: d.m.y
+```
+
+Input
+
+```
+2010-10-10 10:10:19
+```
+
+Output
+
+```
+10.10.10
+```
