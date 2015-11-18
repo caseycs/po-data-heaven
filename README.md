@@ -43,7 +43,7 @@ transformers:
       parameter2: value2
 ```
 
-### reorderAndFilter
+#### reorderAndFilter
 
 Reorders column to the defined order and drop all others.
 
@@ -85,7 +85,7 @@ columns:
         optionName2: optionValue2
 ```
 
-### mysqlDate
+#### mysqlDate
 
 Reorders column to the defined order and drop all others.
 
