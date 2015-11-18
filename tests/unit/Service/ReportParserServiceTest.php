@@ -5,6 +5,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use PHPUnit_Framework_TestCase;
 use PODataHeaven\CellFormatter\IdOfEntitiesFormatter;
+use PODataHeaven\CellFormatter\RawFormatter;
 use PODataHeaven\Model\Column;
 use PODataHeaven\Model\Parameter;
 use PODataHeaven\Model\Report;
@@ -200,5 +201,25 @@ columns:
 
         $column = $tree->reports->first()->columns->offsetGet(1);
         $this->assertSame(Column::ALIGN_RIGHT, $column->align);
+    }
+
+    public function test_getReportsTree_ColumnOptions()
+    {
+        $this->filesystem->put('first-report.yml', 'name: test1
+description: bla bla bla
+sql: >
+ SELECT * FROM `address` WHERE id = :id
+
+columns:
+  id:
+    formatter: url
+    options:
+        a: b
+');
+
+        $tree = $this->service->getReportsTree();
+        $column = $tree->reports->first()->columns->offsetGet(0);
+
+        $this->assertEquals(new RawFormatter(['a' => 'b']), $column->formatter);
     }
 }

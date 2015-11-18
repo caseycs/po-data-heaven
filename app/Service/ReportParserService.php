@@ -163,11 +163,18 @@ class ReportParserService
             } else {
                 $formatterParameter = $this->getValue($cData, 'format', 'raw');
 
+                if ($this->hasValue($cData, 'options')) {
+                    $formatterOptions = $this->getRequiredArrayValue($cData, 'options');
+                } else {
+                    $formatterOptions = [];
+                }
+
                 try {
                     $column->formatter = $this->newObjectByClassName(
                         'CellFormatter',
                         $formatterParameter,
-                        'Formatter'
+                        'Formatter',
+                        $formatterOptions
                     );
                 } catch (ClassNotFoundException $e) {
                     throw new FormatterNotFoundException($formatterParameter, $e);

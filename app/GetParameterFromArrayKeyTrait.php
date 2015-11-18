@@ -2,6 +2,7 @@
 namespace PODataHeaven;
 
 use PODataHeaven\Exception\ParameterMissingException;
+use PODataHeaven\Exception\ParameterNotArrayException;
 
 trait GetParameterFromArrayKeyTrait
 {
@@ -36,6 +37,24 @@ trait GetParameterFromArrayKeyTrait
     {
         if (!isset($data[$key]) || '' === trim($data[$key])) {
             throw new ParameterMissingException($key);
+        }
+        return $data[$key];
+    }
+
+    /**
+     * @param array $data
+     * @param string $key
+     * @return array
+     * @throws ParameterMissingException
+     * @throws ParameterNotArrayException
+     */
+    protected function getRequiredArrayValue(array $data, $key)
+    {
+        if (!array_key_exists($key, $data)) {
+            throw new ParameterMissingException($key);
+        }
+        if (!is_array($data[$key])) {
+            throw new ParameterNotArrayException($key, $data[$key]);
         }
         return $data[$key];
     }
