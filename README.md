@@ -24,47 +24,64 @@ parameters:
   id:
 ```
 
-A complicated one:
+## Report transformers
 
+Sometimes you need some post-processing of SQL. Fot this purpose there are transformers.
+
+Generic example:
 
 ```
-name: Consumer details
-
-description: bla bla bla
+name: Report name
 
 sql: >
- SELECT id, name, age, company_id, tmp FROM `user`
- WHERE company_id = :company_id AND type = :type
+ SELECT * FROM table
 
-parameters:
-  company_id:
-    name: id of tid company
-    idOfEntity: company
-  type:
-    name: user type
+transformers:
+  - exampleTranformerName1
+  - exampleTranformerName2:
+      parameter1: value1
+      parameter2: value2
+```
 
-order: name ASC
+### reorderAndFilter
 
-limit: 100
+Reorders column to the defined order and drop all others.
+
+```
+transformers:
+  - reorderAndFilter
+      columns: [a, b, c]
+```
+
+Input
+
+```
+[[d: 4, c:3, b: 2, a: 1]]
+```
+
+Output
+
+```
+[[a: 1, b:2, c: 3]]
+```
+
+## Cell formatters
+
+Sometime we want a bit more then just a raw value, 
+
+```
+name: Report name
+
+sql: >
+ SELECT value1, value2 FROM table
 
 columns:
-  created_at:
-    format: mysqlDate
-  profile_url:
-    format: url
-  group_id:
-    idOfEntities: group
-  tag_id:
-    idOfEntities: [user_tag, company_tag]
-  description:
-    format: truncate
-    
-transformers:
-  - firstColumnRotate: #will not work for this report
-  - addTwigColumn:
-      after: id
-      name: nameAndAge
-      template: "{{ row['name'] }} AGE {{ row['age'] }}"
-  - removeColumn:
-      column: tmp
+  value1:
+    format: formatterName1
+  value2:
+    format: formatterName2
+    options:
+        optionName1: optionValue1
+        optionName2: optionValue2
 ```
+
