@@ -21,7 +21,7 @@ class ReportParserServiceTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->filesystem = new Filesystem(new MemoryAdapter());
-        $this->service = new ReportParserService($this->filesystem);
+        $this->service = new ReportParserService($this->filesystem, ['db']);
     }
 
     public function test_getReportsTree_one()
