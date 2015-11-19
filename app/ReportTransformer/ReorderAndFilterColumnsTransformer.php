@@ -11,7 +11,7 @@ class ReorderAndFilterColumnsTransformer extends AbstractParameterContainer impl
      */
     public function transform(array $rows)
     {
-        $columnsOrder = $this->getRequiredArrayParameter('order');
+        $columnsOrder = $this->getRequiredArrayParameter('columns');
 
         $result = [];
         foreach ($rows as $row) {

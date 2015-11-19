@@ -9,17 +9,17 @@ class ReorderAndFilterColumnsTransformerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'just reorder' => [
-                ['order' => ['a', 'b']],
+                ['columns' => ['a', 'b']],
                 [['b' => 2, 'a' => 1]],
                 [['a' => 1, 'b' => 2]],
             ],
             'reorder + filter' => [
-                ['order' => ['a', 'c']],
+                ['columns' => ['a', 'c']],
                 [['c' => 3, 'b' => 2, 'a' => 1]],
                 [['a' => 1, 'c' => 3]],
             ],
             'just filter' => [
-                ['order' => ['a']],
+                ['columns' => ['a']],
                 [['b' => 2, 'a' => 1]],
                 [['a' => 1]],
             ],
