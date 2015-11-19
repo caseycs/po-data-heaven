@@ -43,13 +43,13 @@ transformers:
       parameter2: value2
 ```
 
-#### reorderAndFilter
+#### reorderAndFilterColumns
 
 Reorders column to the defined order and drop all others.
 
 ```
 transformers:
-  - reorderAndFilter
+  - reorderAndFilterColumns
       columns: [a, b, c]
 ```
 
