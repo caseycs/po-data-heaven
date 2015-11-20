@@ -15,12 +15,12 @@
 
             var options = {
                 width: 900,
-                height: 500,
-                legend: { position: 'top', maxLines: 3 },
-                isStacked: true
+                height: 500
+//                legend: { position: 'top', maxLines: 3 }
+//                isStacked: true
             };
 
-            var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+            var chart = new google.charts.Bar(document.getElementById('chart_div'));
             chart.draw(data, options);
         }
     </script>
