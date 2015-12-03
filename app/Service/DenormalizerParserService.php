@@ -3,12 +3,6 @@ namespace PODataHeaven\Service;
 
 use Exception;
 use League\Flysystem\Filesystem;
-use PODataHeaven\Collection\DashboardCollection;
-use PODataHeaven\Exception\PODataHeavenException;
-use PODataHeaven\Exception\ReportInvalidException;
-use PODataHeaven\GetParameterFromArrayKeyTrait;
-use PODataHeaven\Model\Dashboard;
-use PODataHeaven\ObjectCreatorTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -20,6 +14,29 @@ class DenormalizerParserService
     public function __construct(Filesystem $fs)
     {
         $this->fs = $fs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAll()
+    {
+        $result = [];
+
+        foreach ($this->fs->listContents() as $ymlFileMetadata) {
+            if (substr($ymlFileMetadata['path'], -4) !== '.yml') {
+                continue;
+            }
+
+            $yml = $this->fs->read($ymlFileMetadata['path']);
+
+            try {
+                $data = Yaml::parse($yml);
+                $result[] = $data;
+            } catch (ParseException $e) {
+            }
+        }
+        return $result;
     }
 
     /**

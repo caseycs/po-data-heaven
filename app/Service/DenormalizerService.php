@@ -1,21 +1,14 @@
 <?php
-namespace PODataHeaven\ConsoleCommand;
+namespace PODataHeaven\Service;
 
-use Doctrine\DBAL\Schema\Schema;
-use PODataHeaven\Service\DenormalizerParserService;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Schema\Schema;
+use Exception;
+use Psr\Log\LoggerInterface;
 
-class DenormalizerConsoleCommand extends Command
+class DenormalizerService
 {
-    /**
-     * @var DenormalizerParserService
-     */
-    private $denormalizer;
-
     /**
      * @var Connection
      */
@@ -33,72 +26,50 @@ class DenormalizerConsoleCommand extends Command
      * @param Connection $targetConnection
      */
     public function __construct(
-        DenormalizerParserService $denormalizer,
         Connection $sourceConnection,
         Connection $targetConnection
     ) {
-        parent::__construct();
-
-        $this->denormalizer = $denormalizer;
         $this->sourceConnection = $sourceConnection;
         $this->targetConnection = $targetConnection;
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $denormalizer
+     * @param LoggerInterface $logger
+     * @throws DBALException
      */
-    protected function configure()
+    public function denormalize(array $denormalizer, LoggerInterface $logger)
     {
-        $this
-            ->setName('pdh:denormalizer')
-            ->setDescription('Data denormalizer')
-            ->addArgument(
-                'denormalizer',
-                InputArgument::REQUIRED,
-                'denormalizer filename without .yml extension'
-            );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $name = $input->getArgument('denormalizer');
-
-        $config = $this->denormalizer->get($name);
-
         //drop tmp table
-        $tableName = $config['resultTable'];
+        $tableName = $denormalizer['resultTable'];
         $tableNameTmp = $tableName . '_tmp';
 
-        $output->writeln("dropping table $tableNameTmp");
+        $logger->info("dropping table $tableNameTmp");
         $sql = sprintf('DROP TABLE IF EXISTS %s', $this->targetConnection->quoteIdentifier($tableNameTmp));
         $this->targetConnection->exec($sql);
 
-        $min = $this->sourceConnection->fetchColumn($config['sqlMinId']);
-        $max = $this->sourceConnection->fetchColumn($config['sqlMaxId']);
+        $min = $this->sourceConnection->fetchColumn($denormalizer['sqlMinId']);
+        $max = $this->sourceConnection->fetchColumn($denormalizer['sqlMaxId']);
 
         $tableCreated = false;
 
-        for ($i = $min; $i <= $max; $i += $config['batch']) {
-            $maxTmp = $i + $config['batch'] - 1;
-            $output->writeln("fetching from $i to $maxTmp");
+        for ($i = $min; $i <= $max; $i += $denormalizer['batch']) {
+            $maxTmp = $i + $denormalizer['batch'] - 1;
+            $logger->info("fetching from $i to $maxTmp");
 
             $params = ['min' => $i, 'max' => $maxTmp];
-            $chunk = $this->sourceConnection->fetchAll($config['sqlData'], $params);
+            $chunk = $this->sourceConnection->fetchAll($denormalizer['sqlData'], $params);
             if (!count($chunk)) {
                 continue;
             }
 
             if (!$tableCreated) {
-                $this->createTable($tableNameTmp, $config, array_keys(reset($chunk)));
+                $this->createTable($tableNameTmp, $denormalizer, array_keys(reset($chunk)));
                 $tableCreated = true;
-
             }
 
             //insert
-            $output->writeln("inserting from $i to $maxTmp");
+            $logger->info("inserting from $i to $maxTmp");
             $sql = 'INSERT INTO ' . $this->targetConnection->quoteIdentifier($tableNameTmp) . 'VALUES ';
 
             foreach ($chunk as $row) {
@@ -113,21 +84,19 @@ class DenormalizerConsoleCommand extends Command
         }
 
         //adding indexes
-        foreach ($config['indexes'] as $indexColumns) {
-            $output->writeln("adding index: " . join(', ' , $indexColumns));
-            $sql = sprintf('alter table %s add index (%s)',
-                $tableNameTmp,
-                join(',', (array)$indexColumns));
+        foreach ($denormalizer['indexes'] as $indexColumns) {
+            $logger->info("adding index: " . join(', ', $indexColumns));
+            $sql = sprintf('alter table %s add index (%s)', $tableNameTmp, join(',', (array)$indexColumns));
             $this->targetConnection->exec($sql);
         }
 
         //drop normal table
-        $output->writeln("dropping table $tableName");
+        $logger->info("dropping table $tableName");
         $sql = sprintf('DROP TABLE IF EXISTS %s', $this->targetConnection->quoteIdentifier($tableName));
         $this->targetConnection->exec($sql);
 
         //rename tmp table to normal one
-        $output->writeln("renaming table  $tableNameTmp to $tableName");
+        $logger->info("renaming table  $tableNameTmp to $tableName");
         $sql = sprintf(
             'ALTER TABLE %s RENAME %s',
             $this->targetConnection->quoteIdentifier($tableNameTmp),
@@ -135,21 +104,28 @@ class DenormalizerConsoleCommand extends Command
         );
         $this->targetConnection->exec($sql);
 
-        $output->writeln("done");
+        $logger->info("done");
     }
 
+    /**
+     * @param $tableNameTmp
+     * @param array $config
+     * @param array $firstRowKeys
+     * @throws DBALException
+     * @throws Exception
+     */
     protected function createTable($tableNameTmp, $config, array $firstRowKeys)
     {
         $configuredColumns = array_keys($config['columns']);
 
         $tmp = array_diff($firstRowKeys, $configuredColumns);
         if ($tmp) {
-            throw new \Exception('columns not configured in yml: ' . join(', ', $tmp));
+            throw new Exception('columns not configured in yml: ' . join(', ', $tmp));
         }
 
         $tmp = array_diff($configuredColumns, $firstRowKeys);
         if ($tmp) {
-            throw new \Exception('columns not exists int the query: ' . join(', ', $tmp));
+            throw new Exception('columns not exists int the query: ' . join(', ', $tmp));
         }
 
         $schema = new Schema();
@@ -164,7 +140,7 @@ class DenormalizerConsoleCommand extends Command
                 $type = $columnDetails['type'];
                 $options = isset($columnDetails['options']) ? $columnDetails['options'] : [];
             } else {
-                throw new \Exception;
+                throw new Exception;
             }
             $tableSchema->addColumn($name, $type, $options);
         }

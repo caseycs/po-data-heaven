@@ -6,6 +6,7 @@ use League\Flysystem\Filesystem;
 use PODataHeaven\Service\DbStructureGeneratorService;
 use PODataHeaven\Service\DashboardParserService;
 use PODataHeaven\Service\DenormalizerParserService;
+use PODataHeaven\Service\DenormalizerService;
 use PODataHeaven\Service\MappingService;
 use PODataHeaven\Service\ReportExecutorService;
 use PODataHeaven\Service\ReportParserService;
@@ -62,6 +63,10 @@ class ApplicationProvider implements ServiceProviderInterface
 
         $app['denormalizer_parser.service'] = function () use ($app) {
             return new DenormalizerParserService($app['denormalizer_filesystem.service']);
+        };
+
+        $app['denormalizer.service'] = function () use ($app) {
+            return new DenormalizerService($app['db'], $app['dbs']['reports']);
         };
 
         $app['mapping.service'] = function () use ($app) {
