@@ -57,13 +57,13 @@ class DenormalizeConsoleCommand extends Command
             ->addOption(
                 'scheduled',
                 's',
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NONE,
                 'run only scheduled'
             )
             ->addOption(
                 'all',
                 'a',
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NONE,
                 'run all'
             )
         ;
@@ -83,7 +83,7 @@ class DenormalizeConsoleCommand extends Command
                 $this->denormalizerService->denormalize($config, $logger);
             }
 
-        } elseif ($input->hasOption('scheduled')) {
+        } elseif ($input->getOption('scheduled')) {
             $run = [];
             foreach ($this->denormalizerParserService->getAll() as $config) {
                 $cron = CronExpression::factory($config['cron']);
