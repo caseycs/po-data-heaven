@@ -16,6 +16,9 @@ class Report
     /** @var int */
     public $limit;
 
+    /** @var bool */
+    public $bold;
+
     /** @var ColumnCollection|Column[] */
     public $columns = [];
 

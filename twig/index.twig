@@ -17,7 +17,15 @@
 
     <ul>
         {% for r in reports %}
-            <li><a href="/report/{{ r.baseName }}">{{ r.name }}</a></li>
+            <li>
+                <a href="/report/{{ r.baseName }}">
+                    {% if r.bold %}
+                        <strong>{{ r.name }}</strong>
+                    {% else %}
+                        {{ r.name }}
+                    {% endif %}
+                </a>
+            </li>
         {% endfor %}
 
     </ul>
@@ -26,7 +34,15 @@
 
     <ul>
         {% for d in dashboards %}
-            <li><a href="/dashboard/{{ d.baseName }}">{{ d.name }}</a></li>
+            <li>
+                <a href="/dashboard/{{ d.baseName }}">
+                    {% if d.bold %}
+                        <strong>{{ d.name }}</strong>
+                    {% else %}
+                        {{ d.name }}
+                    {% endif %}
+                </a>
+            </li>
         {% endfor %}
 
     </ul>

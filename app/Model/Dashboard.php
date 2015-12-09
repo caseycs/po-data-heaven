@@ -17,6 +17,9 @@ class Dashboard
     /** @var string */
     public $report;
 
+    /** @var boolean */
+    public $bold;
+
     /** @var DashboardViewInterface */
     public $view;
 

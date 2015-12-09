@@ -89,6 +89,7 @@ class DashboardParserService
         $dashboard->name = $this->getRequiredValue($data, 'name');
         $dashboard->report = $this->getRequiredValue($data, 'report');
         $dashboard->reportParameters = $this->getValue($data, 'report_parameters', []);
+        $dashboard->bold = $this->hasValue($data, 'bold');
 
         $viewValue = $this->getRequiredValue($data, 'view');
         $parameters = $this->getValue($data, 'parameters', []);

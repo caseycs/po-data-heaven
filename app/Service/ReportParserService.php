@@ -105,6 +105,7 @@ class ReportParserService
             $report->name = $this->getRequiredValue($data, 'name');
             $report->description = $this->getValue($data, 'description');
             $report->sql = $this->getRequiredValue($data, 'sql');
+            $report->bold = $this->hasValue($data, 'bold');
 
             $connection = $this->getValue($data, 'connection', 'db');
             if (!in_array($connection, $this->validDatabaseConnections, true)) {

@@ -220,6 +220,20 @@ columns:
         $tree = $this->service->getReportsTree();
         $column = $tree->reports->first()->columns->offsetGet(0);
 
+        $this->assertFalse($tree->reports->first()->bold);
         $this->assertEquals(new RawFormatter(['a' => 'b']), $column->formatter);
+    }
+
+    public function test_getReportsTree_selected()
+    {
+        $this->filesystem->put('first-report.yml', 'name: test1
+description: bla bla bla
+bold: true
+sql: >
+ SELECT * FROM `address` WHERE id = :id
+');
+
+        $tree = $this->service->getReportsTree();
+        $this->assertTrue($tree->reports->first()->bold);
     }
 }

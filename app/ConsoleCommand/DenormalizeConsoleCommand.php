@@ -102,11 +102,13 @@ class DenormalizeConsoleCommand extends Command
         } else {
             try {
                 $config = $this->denormalizerParserService->get($input->getArgument('denormalizer'));
-                $logger->info('running ' . $config['resultTable']);
-                $this->denormalizerService->denormalize($config, $logger);
             } catch (\Exception $e) {
                 $logger->error('denormalizer not found');
+                return;
             }
+
+            $logger->info('running ' . $config['resultTable']);
+            $this->denormalizerService->denormalize($config, $logger);
         }
     }
 }
