@@ -11,9 +11,9 @@ class PoDataHeavenApplication extends Application
 {
     public function __construct()
     {
-        parent::__construct();
-
         $this['debug'] = getenv('APP_DEBUG');
+
+        parent::__construct();
 
         $this->register(new EnvironmentProvider());
         $this->register(new ApplicationProvider());
