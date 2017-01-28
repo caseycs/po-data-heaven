@@ -39,7 +39,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         putenv("REPORTS_DIR={$testsPath}/tmp/reports");
         putenv("MAPPINGS_DIR={$testsPath}/tmp/mappings");
         putenv("DASHBOARDS_DIR={$testsPath}/tmp/dashboards");
-        putenv("LOG_DIR={$testsPath}/tmp/log");
+        putenv("LOGFILE={$testsPath}/tmp/log/application.log");
     }
 
     protected function prepareDatabase()

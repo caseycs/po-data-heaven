@@ -48,7 +48,7 @@ class EnvironmentProvider implements ServiceProviderInterface
         $app->register(
             new MonologServiceProvider(),
             array(
-                'monolog.logfile' => getenv('LOG_DIR') . '/application.log',
+                'monolog.logfile' => getenv('LOGFILE'),
             )
         );
     }
