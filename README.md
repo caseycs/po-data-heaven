@@ -1,5 +1,11 @@
 # Product Owner Data Heaven
 
+## Project isAbandoned, please use AirBnb Superset instead
+
+That was a good try at that time, but nowadays there are better alternatives. Take a look at https://github.com/airbnb/superset !
+
+## Overall
+
 [![Build Status](https://travis-ci.org/caseycs/po-data-heaven.svg?branch=master)](https://travis-ci.org/caseycs/po-data-heaven)
 
 Fast and simple way to build reports against relational data. Inspired by hours or investigating
