@@ -1,6 +1,6 @@
 # Product Owner Data Heaven
 
-## Project isAbandoned, please use AirBnb Superset instead
+## Project is abandoned, please try AirBnb Superset!
 
 That was a good try at that time, but nowadays there are better alternatives. Take a look at https://github.com/airbnb/superset !
 
